@@ -1,0 +1,19 @@
+{
+  "name": "suria-design-html-10-8-26-(2)",
+  "version": "1.0.0",
+  "description": "This is a design mockup created in a visual design tool (an appifact design canvas), exported as a standalone page. Treat it as a REFERENCE MOCKUP, not production code: the markup and inline styles carry the design's precise values — colors, font sizes, spacing, radii, shadows, layout — which an implementation should replicate faithfully in its own components and styling system rather than copy wholesale.",
+  "main": "support.js",
+  "scripts": {
+    "dev": "astro dev --port 4321 --host",
+    "build": "astro build",
+    "preview": "astro preview --port 4321 --host"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.64.5",
+    "astro": "^4.16.19",
+    "lenis": "^1.3.26"
+  }
+}

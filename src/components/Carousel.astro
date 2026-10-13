@@ -1,0 +1,432 @@
+---
+import { PIECES, ACCENT_COLOR } from '../data/pieces';
+
+interface Props {
+  accent?: string;
+}
+
+const { accent = ACCENT_COLOR } = Astro.props;
+---
+
+<section id="work" class="sd-work" style={`--accent-color: ${accent};`}>
+  <div class="sd-work-content">
+    <div 
+      class="sd-carousel" 
+      id="suria-carousel" 
+      aria-roledescription="carousel" 
+      aria-label="Selected pieces"
+    >
+    <!-- Left: Image Viewer / Canvas -->
+    <div 
+      class="sd-carousel-viewport" 
+      id="carousel-viewport" 
+      tabindex="0" 
+      aria-label="Jewelry image viewer. Swipe or use arrow keys."
+    >
+      {PIECES.map((piece, index) => (
+        <img
+          src={piece.image}
+          alt={piece.alt}
+          id={`slide-img-${index}`}
+          class={`sd-carousel-img ${index === 0 ? 'is-active' : ''}`}
+          aria-hidden={index === 0 ? "false" : "true"}
+          draggable="false"
+          loading={index === 0 ? "eager" : "lazy"}
+        />
+      ))}
+    </div>
+
+    <!-- Right: Editorial Details & Controls -->
+    <div class="sd-carousel-panel">
+      <!-- Section Title & Counter -->
+      <div class="sd-carousel-header">
+        <h2 class="sd-carousel-title">Selected work</h2>
+        <span 
+          id="carousel-counter" 
+          class="sd-carousel-counter" 
+          aria-live="polite"
+        >
+          01 / 0{PIECES.length}
+        </span>
+      </div>
+
+      <!-- Current Piece Details -->
+      <div class="sd-piece-details">
+        <h3 id="piece-name" class="sd-piece-name">{PIECES[0].name}</h3>
+        <span id="piece-code" class="sd-piece-code">{PIECES[0].code}</span>
+        <p id="piece-desc" class="sd-piece-desc">{PIECES[0].desc}</p>
+      </div>
+
+      <!-- Segment Progress & Controls -->
+      <div class="sd-carousel-controls">
+        <!-- Segments -->
+        <div class="sd-segments" role="tablist" aria-label="Slides">
+          {PIECES.map((piece, index) => (
+            <button
+              type="button"
+              class={`sd-segment-btn ${index === 0 ? 'is-active' : ''}`}
+              id={`segment-btn-${index}`}
+              role="tab"
+              aria-selected={index === 0 ? "true" : "false"}
+              aria-label={`Show ${piece.name}`}
+              data-index={index}
+            >
+              <span class="sd-segment-bar"></span>
+            </button>
+          ))}
+        </div>
+
+        <!-- Arrows & Lookbook link -->
+        <div class="sd-nav-row">
+          <div class="sd-nav-arrows">
+            <button 
+              type="button" 
+              id="carousel-prev" 
+              class="sd-nav-btn" 
+              aria-label="Previous piece"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path d="M12.5 4.5L7 10l5.5 5.5"></path>
+              </svg>
+            </button>
+            <button 
+              type="button" 
+              id="carousel-next" 
+              class="sd-nav-btn" 
+              aria-label="Next piece"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path d="M7.5 4.5L13 10l-5.5 5.5"></path>
+              </svg>
+            </button>
+          </div>
+
+          <a href="#contact" class="sd-lookbook-link">Ask for the full lookbook</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</section>
+
+<!-- Embedded Client Script for Carousel Interaction -->
+<script define:vars={{ pieces: PIECES, accent }}>
+  (() => {
+    let currentIndex = 0;
+    const total = pieces.length;
+    let pointerStartX = null;
+
+    const viewport = document.getElementById('carousel-viewport');
+    const counterEl = document.getElementById('carousel-counter');
+    const nameEl = document.getElementById('piece-name');
+    const codeEl = document.getElementById('piece-code');
+    const descEl = document.getElementById('piece-desc');
+    const prevBtn = document.getElementById('carousel-prev');
+    const nextBtn = document.getElementById('carousel-next');
+    const segmentBtns = Array.from(document.querySelectorAll('.sd-segment-btn'));
+    const slideImgs = Array.from(document.querySelectorAll('.sd-carousel-img'));
+
+    function pad(v) {
+      return (v < 10 ? '0' : '') + v;
+    }
+
+    function goTo(index) {
+      currentIndex = ((index % total) + total) % total;
+      const cur = pieces[currentIndex];
+
+      // Update text
+      if (counterEl) counterEl.textContent = `${pad(currentIndex + 1)} / ${pad(total)}`;
+      if (nameEl) nameEl.textContent = cur.name;
+      if (codeEl) codeEl.textContent = cur.code;
+      if (descEl) descEl.textContent = cur.desc;
+
+      // Update images
+      slideImgs.forEach((img, j) => {
+        const isActive = j === currentIndex;
+        img.classList.toggle('is-active', isActive);
+        img.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+      });
+
+      // Update segments
+      segmentBtns.forEach((btn, j) => {
+        const isActive = j === currentIndex;
+        btn.classList.toggle('is-active', isActive);
+        btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+    }
+
+    // Handlers
+    function prev() { goTo(currentIndex - 1); }
+    function next() { goTo(currentIndex + 1); }
+
+    prevBtn?.addEventListener('click', prev);
+    nextBtn?.addEventListener('click', next);
+
+    segmentBtns.forEach((btn, idx) => {
+      btn.addEventListener('click', () => goTo(idx));
+    });
+
+    // Touch / Pointer Swipe
+    if (viewport) {
+      viewport.addEventListener('pointerdown', (e) => {
+        pointerStartX = e.clientX;
+      });
+
+      viewport.addEventListener('pointerup', (e) => {
+        if (pointerStartX === null) return;
+        const delta = e.clientX - pointerStartX;
+        pointerStartX = null;
+        if (delta < -40) next();
+        else if (delta > 40) prev();
+      });
+
+      // Keyboard support
+      viewport.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          prev();
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          next();
+        }
+      });
+    }
+  })();
+</script>
+
+<style>
+  .sd-work {
+    width: 100%;
+    min-height: 992px;
+    height: auto;
+    flex-shrink: 0;
+    background: #F1F1F1;
+  }
+
+  .sd-work-content {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    padding: 96px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+
+  .sd-carousel {
+    height: 800px;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 32px;
+  }
+
+  .sd-carousel-viewport {
+    grid-column: span 7;
+    position: relative;
+    background: #F1F1F1;
+    overflow: hidden;
+    touch-action: pan-y;
+    cursor: grab;
+    user-select: none;
+    outline: none;
+  }
+
+  .sd-carousel-viewport:active {
+    cursor: grabbing;
+  }
+
+  .sd-carousel-viewport:focus-visible {
+    outline: 2px solid #1F262D;
+    outline-offset: -2px;
+  }
+
+  .sd-carousel-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .sd-carousel-img.is-active {
+    opacity: 1;
+  }
+
+  .sd-carousel-panel {
+    grid-column: 9 / span 4;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 4px 0;
+  }
+
+  .sd-carousel-header {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .sd-carousel-title {
+    margin: 0;
+    font-weight: 500;
+    font-size: 64px;
+    line-height: 1;
+    color: #1F262D;
+  }
+
+  .sd-carousel-counter {
+    font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 14px;
+    color: #56606A;
+  }
+
+  .sd-piece-details {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .sd-piece-name {
+    margin: 0;
+    font-size: 44px;
+    font-weight: 500;
+    line-height: 1.08;
+    color: #1F262D;
+  }
+
+  .sd-piece-code {
+    font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 14px;
+    color: #56606A;
+  }
+
+  .sd-piece-desc {
+    margin: 8px 0 0;
+    font-size: 18px;
+    line-height: 1.6;
+    font-weight: 300;
+    color: #3F4850;
+  }
+
+  .sd-carousel-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .sd-segments {
+    display: flex;
+    gap: 6px;
+  }
+
+  .sd-segment-btn {
+    flex-grow: 1;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+
+  .sd-segment-bar {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background: #B4BAB6;
+    transition: background-color 0.3s ease;
+  }
+
+  .sd-segment-btn.is-active .sd-segment-bar {
+    background: var(--accent-color, #E0A030);
+  }
+
+  .sd-nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .sd-nav-arrows {
+    display: flex;
+    gap: 12px;
+  }
+
+  .sd-nav-btn {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 1px solid #1F262D;
+    background: transparent;
+    color: #1F262D;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.2s ease;
+  }
+
+  .sd-nav-btn:hover {
+    background: #1F262D;
+    color: #F1F1F1;
+  }
+
+  .sd-lookbook-link {
+    font-size: 15px;
+    text-decoration: none;
+    border-bottom: 1px solid #1F262D;
+    padding: 12px 0 3px;
+    color: #1F262D;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .sd-lookbook-link:hover {
+    color: #56606A;
+    border-color: #56606A;
+  }
+
+  @media (max-width: 1024px) {
+    .sd-work {
+      min-height: auto;
+      height: auto;
+    }
+    .sd-work-content {
+      padding: 60px 40px;
+    }
+    .sd-carousel {
+      height: auto;
+      grid-template-columns: 1fr;
+      row-gap: 40px;
+    }
+    .sd-carousel-viewport {
+      grid-column: 1 / -1;
+      height: 480px;
+    }
+    .sd-carousel-panel {
+      grid-column: 1 / -1;
+      gap: 32px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .sd-work-content {
+      padding: 40px 24px;
+    }
+    .sd-carousel-viewport {
+      height: 340px;
+    }
+    .sd-carousel-title {
+      font-size: 44px;
+    }
+    .sd-piece-name {
+      font-size: 32px;
+    }
+  }
+</style>

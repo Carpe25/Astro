@@ -1,0 +1,153 @@
+---
+interface Props {
+  accent?: string;
+}
+
+const { accent = "#E0A030" } = Astro.props;
+
+const steps = [
+  {
+    step: "01",
+    title: "Introduction",
+    desc: "Clients come to us through someone they know. Tell us who referred you when you get in touch."
+  },
+  {
+    step: "02",
+    title: "Consultation",
+    desc: "A private appointment to talk through what you have in mind, the occasion, and the stones you are drawn to."
+  },
+  {
+    step: "03",
+    title: "Design and making",
+    desc: "We refine the design with you, then make the finished piece."
+  }
+];
+---
+
+<section aria-labelledby="how" class="sd-how">
+  <div class="sd-how-content">
+    <h2 id="how" class="sd-how-heading">How it works</h2>
+
+    <ol class="sd-how-list">
+      {steps.map((item) => (
+        <li class="sd-how-step">
+          <span class="sd-how-pip" aria-hidden="true" style={`background: ${accent};`}></span>
+          <span class="sd-how-step-num">{item.step}</span>
+          <span class="sd-how-step-title">{item.title}</span>
+          <span class="sd-how-step-desc">{item.desc}</span>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .sd-how {
+    width: 100%;
+    min-height: auto;
+    height: auto;
+    flex-shrink: 0;
+    border-top: 1px solid #C9CDC9;
+    background: #E8EAE7;
+  }
+
+  .sd-how-content {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    padding: 96px 80px;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 32px;
+    align-items: start;
+  }
+
+  .sd-how-heading {
+    grid-column: span 3;
+    margin: 0;
+    padding-top: 14px;
+    font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 14px;
+    font-weight: 400;
+    color: #56606A;
+  }
+
+  .sd-how-list {
+    grid-column: 4 / span 9;
+    margin: 0;
+    padding: 26px 0 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 0;
+  }
+
+  .sd-how-step {
+    position: relative;
+    border-top: 1px solid #C9CDC9;
+    padding: 32px 40px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .sd-how-pip {
+    position: absolute;
+    top: -6px;
+    left: 0;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+  }
+
+  .sd-how-step-num {
+    font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 14px;
+    color: #56606A;
+  }
+
+  .sd-how-step-title {
+    font-size: 24px;
+    font-weight: 500;
+    color: #1F262D;
+  }
+
+  .sd-how-step-desc {
+    font-size: 17px;
+    line-height: 1.6;
+    font-weight: 300;
+    color: #3F4850;
+  }
+
+  @media (max-width: 1024px) {
+    .sd-how {
+      min-height: auto;
+      height: auto;
+    }
+    .sd-how-content {
+      padding: 60px 40px;
+      grid-template-columns: 1fr;
+      row-gap: 32px;
+    }
+    .sd-how-heading {
+      grid-column: 1 / -1;
+      padding-top: 0;
+    }
+    .sd-how-list {
+      grid-column: 1 / -1;
+      grid-template-columns: 1fr;
+      row-gap: 32px;
+      padding-top: 0;
+    }
+    .sd-how-step {
+      padding-right: 0;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .sd-how-content {
+      padding: 48px 24px;
+    }
+  }
+</style>

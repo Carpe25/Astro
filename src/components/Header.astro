@@ -1,0 +1,75 @@
+---
+// Minimalist header navigation for Suria Design
+---
+
+<header class="header">
+  <nav aria-label="Main" class="nav">
+    <a href="#work" class="nav-link">Work</a>
+    <a href="#studio" class="nav-link">Studio</a>
+    <a href="#contact" class="nav-cta">Request an appointment</a>
+  </nav>
+</header>
+
+<style>
+  .header {
+    position: relative;
+    z-index: 2;
+    height: 96px;
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    padding: 0 80px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    font-size: 15px;
+    font-weight: 400;
+  }
+
+  .nav-link {
+    text-decoration: none;
+    color: #F2F3F0;
+    padding: 12px 0;
+    transition: color 0.2s ease;
+  }
+
+  .nav-link:hover {
+    color: #D5D9DC;
+  }
+
+  .nav-cta {
+    text-decoration: none;
+    color: #F2F3F0;
+    padding: 12px 22px;
+    border: 1px solid #F2F3F0;
+    border-radius: 999px;
+    transition: all 0.2s ease;
+  }
+
+  .nav-cta:hover {
+    background: rgba(242, 243, 240, 0.1);
+    color: #FFFFFF;
+  }
+
+  @media (max-width: 768px) {
+    .header {
+      padding: 0 24px;
+      height: 80px;
+    }
+    .nav {
+      gap: 20px;
+      font-size: 14px;
+    }
+    .nav-cta {
+      padding: 8px 16px;
+    }
+  }
+</style>

@@ -1,0 +1,261 @@
+---
+interface Props {
+  accent?: string;
+}
+
+const { accent = "#E0A030" } = Astro.props;
+---
+
+<section id="contact" class="sd-contact sd-dark">
+  <div class="sd-contact-content">
+  <!-- Left Column: Copy & Email -->
+  <div class="sd-contact-info">
+    <h2 class="sd-contact-title">Request an appointment</h2>
+    <p class="sd-contact-desc">
+      We work with a small number of clients, by referral. Tell us a little about yourself and we will be in touch to arrange a time.
+    </p>
+    <p class="sd-contact-direct">
+      Or write to <a href="mailto:hello@suria.design">[hello@suria.design]</a>
+    </p>
+  </div>
+
+  <!-- Right Column: Appointment Form -->
+  <form class="sd-contact-form" onsubmit="event.preventDefault();">
+    <div class="sd-field-group">
+      <label for="d-name">Full name</label>
+      <input id="d-name" name="name" class="sd-field" type="text" autocomplete="name" required />
+    </div>
+
+    <div class="sd-field-group">
+      <label for="d-email">Email</label>
+      <input id="d-email" name="email" class="sd-field" type="email" autocomplete="email" required />
+    </div>
+
+    <div class="sd-field-group">
+      <label for="d-phone">Phone</label>
+      <input id="d-phone" name="phone" class="sd-field" type="tel" autocomplete="tel" />
+    </div>
+
+    <div class="sd-field-group">
+      <label for="d-ref">Who referred you?</label>
+      <input id="d-ref" name="referrer" class="sd-field" type="text" />
+    </div>
+
+    <div class="sd-field-group">
+      <label for="d-interest">What are you interested in?</label>
+      <select id="d-interest" name="interest" class="sd-field">
+        <option value="">Choose one</option>
+        <option value="engagement">Engagement ring</option>
+        <option value="custom">A custom piece</option>
+        <option value="redesign">Redesigning a piece I own</option>
+        <option value="other">Something else</option>
+      </select>
+    </div>
+
+    <div class="sd-field-group">
+      <label for="d-timing">When do you need it?</label>
+      <select id="d-timing" name="timing" class="sd-field">
+        <option value="">Choose one</option>
+        <option value="month">Within a month</option>
+        <option value="1-3months">In one to three months</option>
+        <option value="later">Later than that</option>
+        <option value="flexible">No fixed date</option>
+      </select>
+    </div>
+
+    <div class="sd-field-group sd-col-span-2">
+      <label for="d-msg">Anything else we should know?</label>
+      <textarea id="d-msg" name="message" class="sd-field sd-textarea" rows="4"></textarea>
+    </div>
+
+    <div class="sd-form-actions sd-col-span-2">
+      <button 
+        type="submit" 
+        class="sd-submit-btn" 
+        style={`background: ${accent};`}
+      >
+        Send request
+      </button>
+      <span class="sd-form-disclaimer">
+        We use your details only to reply to this request.
+      </span>
+    </div>
+  </form>
+  </div>
+</section>
+
+<style>
+  .sd-contact {
+    width: 100%;
+    min-height: auto;
+    height: auto;
+    flex-shrink: 0;
+    background: #232B33;
+    color: #E8EAE7;
+    position: relative;
+  }
+
+  .sd-contact-content {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    padding: 120px 80px;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 32px;
+    align-items: start;
+  }
+
+  .sd-contact-info {
+    grid-column: span 5;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .sd-contact-title {
+    margin: 0;
+    font-weight: 500;
+    font-size: 54px;
+    line-height: 1.06;
+  }
+
+  .sd-contact-desc {
+    margin: 0;
+    max-width: 420px;
+    font-size: 18px;
+    line-height: 1.6;
+    font-weight: 300;
+    color: #AEB6BD;
+  }
+
+  .sd-contact-direct {
+    margin: 0;
+    font-size: 16px;
+    color: #AEB6BD;
+  }
+
+  .sd-contact-direct a {
+    text-decoration: none;
+    border-bottom: 1px solid rgba(174, 182, 189, 0.4);
+    padding-bottom: 2px;
+  }
+
+  .sd-contact-form {
+    grid-column: 7 / span 6;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 40px;
+    row-gap: 40px;
+  }
+
+  .sd-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .sd-field-group label {
+    font-size: 14px;
+    color: #AEB6BD;
+  }
+
+  .sd-field {
+    height: 48px;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid #5B6570;
+    color: #E8EAE7;
+    font-family: inherit;
+    font-size: 18px;
+    font-weight: 300;
+    padding: 0;
+    border-radius: 0;
+    transition: border-color 0.2s ease;
+  }
+
+  .sd-field:focus {
+    outline: none;
+    border-bottom-color: #E8EAE7;
+  }
+
+  .sd-textarea {
+    height: 120px;
+    resize: none;
+    padding: 8px 0;
+  }
+
+  .sd-col-span-2 {
+    grid-column: span 2;
+  }
+
+  .sd-form-actions {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    padding-top: 8px;
+  }
+
+  .sd-submit-btn {
+    color: #1F262D;
+    border: 0;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 17px 34px;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+
+  .sd-submit-btn:hover {
+    transform: translateY(-1px);
+    opacity: 0.95;
+  }
+
+  .sd-form-disclaimer {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #AEB6BD;
+  }
+
+  @media (max-width: 1024px) {
+    .sd-contact {
+      min-height: auto;
+      height: auto;
+    }
+    .sd-contact-content {
+      padding: 80px 40px;
+      grid-template-columns: 1fr;
+      row-gap: 60px;
+    }
+    .sd-contact-info {
+      grid-column: 1 / -1;
+    }
+    .sd-contact-form {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .sd-contact-content {
+      padding: 60px 24px;
+    }
+    .sd-contact-form {
+      grid-template-columns: 1fr;
+      row-gap: 32px;
+    }
+    .sd-col-span-2 {
+      grid-column: 1 / -1;
+    }
+    .sd-form-actions {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .sd-contact-title {
+      font-size: 40px;
+    }
+  }
+</style>

@@ -1,0 +1,33 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/Hero.astro';
+import Studio from '../components/Studio.astro';
+import Carousel from '../components/Carousel.astro';
+import HowItWorks from '../components/HowItWorks.astro';
+import ContactForm from '../components/ContactForm.astro';
+import Footer from '../components/Footer.astro';
+import { ACCENT_COLOR } from '../data/pieces';
+
+const accent = ACCENT_COLOR; // #E0A030 warm studio gold
+---
+
+<Layout title="Suria Design — Fine Jewelry Studio" accent={accent}>
+  <main class="page-container">
+    <Hero accent={accent} />
+    <Studio />
+    <Carousel accent={accent} />
+    <HowItWorks accent={accent} />
+    <ContactForm accent={accent} />
+    <Footer />
+  </main>
+</Layout>
+
+<style>
+  .page-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #E8EAE7;
+    overflow-x: clip;
+  }
+</style>

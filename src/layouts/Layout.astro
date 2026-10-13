@@ -1,0 +1,126 @@
+---
+import 'lenis/dist/lenis.css';
+
+interface Props {
+  title?: string;
+  accent?: string;
+}
+
+const { 
+  title = "Suria Design — Fine Jewelry Studio",
+  accent = "#E0A030"
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <style define:vars={{ accent }}>
+      :root {
+        --sd-accent: var(--accent, #E0A030);
+        --sd-bg: #E8EAE7;
+        --sd-text: #1F262D;
+        --sd-muted: #56606A;
+        --sd-subtle: #3F4850;
+        --sd-border: #C9CDC9;
+        --sd-dark-bg: #232B33;
+        --sd-dark-text: #E8EAE7;
+        --sd-dark-muted: #AEB6BD;
+        --sd-dark-border: #3A444E;
+        --sd-font-sans: 'Archivo', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        --sd-font-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        background: var(--sd-bg);
+        color: var(--sd-text);
+        font-family: var(--sd-font-sans);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      a {
+        color: var(--sd-text);
+        transition: color 0.2s ease;
+      }
+
+      a:hover {
+        color: var(--sd-muted);
+      }
+
+      a:focus-visible,
+      button:focus-visible {
+        outline: 2px solid var(--sd-text);
+        outline-offset: 4px;
+      }
+
+      .sd-field:focus {
+        outline: none;
+        border-bottom-color: #E8EAE7 !important;
+      }
+
+      .sd-field option {
+        color: #1F262D;
+        background: #E8EAE7;
+      }
+
+      .sd-dark a {
+        color: var(--sd-dark-text);
+      }
+
+      .sd-dark a:hover {
+        color: var(--sd-dark-muted);
+      }
+
+      .sd-dark a:focus-visible,
+      .sd-dark button:focus-visible {
+        outline-color: var(--sd-dark-text);
+      }
+    </style>
+  </head>
+  <body>
+    <slot />
+
+    <script>
+      import Lenis from 'lenis';
+
+      const lenis = new Lenis({
+        autoRaf: true,
+        anchors: true,
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smoothWheel: true,
+      });
+
+      // Smooth scroll for internal anchor links with Lenis
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener('click', (e) => {
+          const href = anchor.getAttribute('href');
+          if (href && href.length > 1) {
+            const target = document.querySelector(href);
+            if (target) {
+              e.preventDefault();
+              lenis.scrollTo(target, { offset: 0, duration: 1.2 });
+              history.pushState(null, '', href);
+            }
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

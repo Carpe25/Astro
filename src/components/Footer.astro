@@ -1,0 +1,82 @@
+---
+// Footer component
+---
+
+<footer class="sd-footer sd-dark">
+  <div class="sd-footer-content">
+    <span class="sd-footer-brand">Suria Design</span>
+    <span class="sd-footer-policy">By referral and appointment</span>
+    <div class="sd-footer-meta">
+      <a href="mailto:hello@suria.design" class="sd-footer-email">[hello@suria.design]</a>
+      <span class="sd-footer-copyright">© 2026 Suria Design</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .sd-footer {
+    width: 100%;
+    background: #232B33;
+    color: #AEB6BD;
+    border-top: 1px solid #3A444E;
+    box-sizing: border-box;
+  }
+
+  .sd-footer-content {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    padding: 56px 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    font-size: 15px;
+  }
+
+  .sd-footer-brand {
+    font-weight: 500;
+    font-size: 26px;
+    color: #E8EAE7;
+  }
+
+  .sd-footer-policy {
+    align-self: center;
+  }
+
+  .sd-footer-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+
+  .sd-footer-email {
+    text-decoration: none;
+    color: #AEB6BD;
+  }
+
+  .sd-footer-email:hover {
+    color: #E8EAE7;
+  }
+
+  .sd-footer-copyright {
+    font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 13px;
+  }
+
+  @media (max-width: 768px) {
+    .sd-footer-content {
+      flex-direction: column;
+      gap: 32px;
+      padding: 40px 24px;
+      align-items: flex-start;
+    }
+    .sd-footer-policy {
+      align-self: flex-start;
+    }
+    .sd-footer-meta {
+      align-items: flex-start;
+    }
+  }
+</style>
