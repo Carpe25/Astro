@@ -48,6 +48,64 @@
       box-shadow: 0 0 50px rgba(0,0,0,0.06);
     }
 
+    /* Soft motion entrance when components are active in viewport */
+    html.has-motion .sd-section-track {
+      opacity: 0;
+      transition: opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity;
+    }
+
+    html.has-motion .sd-section-track.is-active-view {
+      opacity: 1;
+    }
+
+    /* Content coming from the LEFT side */
+    html.has-motion .sd-reveal-left {
+      opacity: 0;
+      transform: translateX(-52px);
+      filter: blur(4px);
+      transition: opacity 1.15s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 1.15s cubic-bezier(0.16, 1, 0.3, 1),
+                  filter 1.15s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, transform, filter;
+    }
+
+    html.has-motion .sd-section-track.is-active-view .sd-reveal-left,
+    html.has-motion .sd-reveal-left.is-revealed {
+      opacity: 1;
+      transform: translateX(0);
+      filter: blur(0);
+    }
+
+    /* Content coming from the RIGHT side */
+    html.has-motion .sd-reveal-right {
+      opacity: 0;
+      transform: translateX(52px);
+      filter: blur(4px);
+      transition: opacity 1.15s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 1.15s cubic-bezier(0.16, 1, 0.3, 1),
+                  filter 1.15s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, transform, filter;
+    }
+
+    html.has-motion .sd-section-track.is-active-view .sd-reveal-right,
+    html.has-motion .sd-reveal-right.is-revealed {
+      opacity: 1;
+      transform: translateX(0);
+      filter: blur(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html.has-motion .sd-section-track,
+      html.has-motion .sd-reveal-left,
+      html.has-motion .sd-reveal-right {
+        opacity: 1 !important;
+        transform: none !important;
+        filter: none !important;
+        transition: none !important;
+      }
+    }
+
     /* HERO SECTION */
     .sd-hero {
       position: relative;
@@ -614,9 +672,9 @@
 <body>
   <div class="page-container">
     <!-- HERO SECTION -->
-    <div class="sd-hero">
+    <div class="sd-hero sd-section-track">
       <div class="sd-hero-overlay" aria-hidden="true"></div>
-      <div class="sd-hero-orb" aria-hidden="true"></div>
+      <div class="sd-hero-orb sd-reveal-right" aria-hidden="true"></div>
 
       <header class="header">
         <nav aria-label="Main" class="nav">
@@ -627,7 +685,7 @@
       </header>
 
       <section class="sd-hero-content">
-        <div class="sd-hero-text">
+        <div class="sd-hero-text sd-reveal-left">
           <h1 class="sd-hero-title">Suria<br>Design</h1>
           <p class="sd-hero-description">Suria Design is a design studio beginning with fine jewelry. We work privately, by referral and appointment.</p>
           <div class="sd-hero-actions">
@@ -639,16 +697,16 @@
     </div>
 
     <!-- STUDIO SECTION -->
-    <section id="studio" class="sd-studio">
-      <h2 class="sd-studio-heading">The studio</h2>
-      <p class="sd-studio-body">Jewelry is our first medium. Each piece is conceived one to one, with proportion, stone and setting chosen for the person who will wear it.</p>
+    <section id="studio" class="sd-studio sd-section-track">
+      <h2 class="sd-studio-heading sd-reveal-left">The studio</h2>
+      <p class="sd-studio-body sd-reveal-right">Jewelry is our first medium. Each piece is conceived one to one, with proportion, stone and setting chosen for the person who will wear it.</p>
     </section>
 
     <!-- CAROUSEL SECTION -->
-    <section id="work" class="sd-work">
+    <section id="work" class="sd-work sd-section-track">
       <div class="sd-carousel" id="suria-carousel" aria-roledescription="carousel" aria-label="Selected pieces">
         <!-- Viewport -->
-        <div class="sd-carousel-viewport" id="carousel-viewport" tabindex="0" aria-label="Selected jewelry collection. Drag or click arrows to view.">
+        <div class="sd-carousel-viewport sd-reveal-left" id="carousel-viewport" tabindex="0" aria-label="Selected jewelry collection. Drag or click arrows to view.">
           <img src="./assets/304be120b386ba9415be91d00c6c35c4.jpg" alt="Yellow gold necklace of emerald-cut stones graded through the rainbow" class="sd-carousel-img is-active" aria-hidden="false" draggable="false">
           <img src="./assets/c471f12e5057e4db028394c77f5d9fc1.jpg" alt="Necklace with five graduated round diamonds" class="sd-carousel-img" aria-hidden="true" draggable="false">
           <img src="./assets/214e92539844b44e12bcf92acf55a30f.jpg" alt="Pendant with a green and a red pear-shaped stone" class="sd-carousel-img" aria-hidden="true" draggable="false">
@@ -660,7 +718,7 @@
         </div>
 
         <!-- Details & Controls -->
-        <div class="sd-carousel-panel">
+        <div class="sd-carousel-panel sd-reveal-right">
           <div class="sd-carousel-header">
             <h2 class="sd-carousel-title">Selected work</h2>
             <span id="carousel-counter" class="sd-carousel-counter" aria-live="polite">01 / 08</span>
@@ -706,9 +764,9 @@
     </section>
 
     <!-- HOW IT WORKS SECTION -->
-    <section aria-labelledby="how" class="sd-how">
-      <h2 id="how" class="sd-how-heading">How it works</h2>
-      <ol class="sd-how-list">
+    <section aria-labelledby="how" class="sd-how sd-section-track">
+      <h2 id="how" class="sd-how-heading sd-reveal-left">How it works</h2>
+      <ol class="sd-how-list sd-reveal-right">
         <li class="sd-how-step">
           <span class="sd-how-pip" aria-hidden="true"></span>
           <span class="sd-how-step-num">01</span>
@@ -731,14 +789,14 @@
     </section>
 
     <!-- CONTACT SECTION -->
-    <section id="contact" class="sd-contact">
-      <div class="sd-contact-info">
+    <section id="contact" class="sd-contact sd-section-track">
+      <div class="sd-contact-info sd-reveal-left">
         <h2 class="sd-contact-title">Request an appointment</h2>
         <p class="sd-contact-desc">We work with a small number of clients, by referral. Tell us a little about yourself and we will be in touch to arrange a time.</p>
         <p class="sd-contact-direct">Or write to <a href="mailto:hello@suria.design">[hello@suria.design]</a></p>
       </div>
 
-      <form class="sd-contact-form" onsubmit="event.preventDefault(); alert('Appointment request received! We will be in touch soon.');">
+      <form class="sd-contact-form sd-reveal-right" onsubmit="event.preventDefault(); alert('Appointment request received! We will be in touch soon.');">
         <div class="sd-field-group">
           <label for="d-name">Full name</label>
           <input id="d-name" class="sd-field" type="text" autocomplete="name" required>
@@ -787,10 +845,10 @@
     </section>
 
     <!-- FOOTER -->
-    <footer class="sd-footer">
-      <span class="sd-footer-brand">Suria Design</span>
+    <footer class="sd-footer sd-section-track">
+      <span class="sd-footer-brand sd-reveal-left">Suria Design</span>
       <span class="sd-footer-policy">By referral and appointment</span>
-      <div class="sd-footer-meta">
+      <div class="sd-footer-meta sd-reveal-right">
         <a href="mailto:hello@suria.design" class="sd-footer-email">[hello@suria.design]</a>
         <span class="sd-footer-copyright">© 2026 Suria Design</span>
       </div>
@@ -868,6 +926,27 @@
         if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
         else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
       });
+    }
+
+    // Soft motion entrance when components are active in viewport
+    document.documentElement.classList.add('has-motion');
+    const trackedSections = document.querySelectorAll('.sd-section-track');
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-active-view');
+            obs.unobserve(entry.target);
+          }
+        });
+      }, {
+        root: null,
+        rootMargin: '0px 0px -12% 0px',
+        threshold: 0.05
+      });
+      trackedSections.forEach((sec) => observer.observe(sec));
+    } else {
+      trackedSections.forEach((sec) => sec.classList.add('is-active-view'));
     }
   </script>
 </body>

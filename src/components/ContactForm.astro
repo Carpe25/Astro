@@ -6,10 +6,10 @@ interface Props {
 const { accent = "#E0A030" } = Astro.props;
 ---
 
-<section id="contact" class="sd-contact sd-dark">
+<section id="contact" class="sd-contact sd-dark sd-section-track">
   <div class="sd-contact-content">
   <!-- Left Column: Copy & Email -->
-  <div class="sd-contact-info">
+  <div class="sd-contact-info sd-reveal-left" data-reveal-delay="100">
     <h2 class="sd-contact-title">Request an appointment</h2>
     <p class="sd-contact-desc">
       We work with a small number of clients, by referral. Tell us a little about yourself and we will be in touch to arrange a time.
@@ -20,7 +20,7 @@ const { accent = "#E0A030" } = Astro.props;
   </div>
 
   <!-- Right Column: Appointment Form -->
-  <form class="sd-contact-form" onsubmit="event.preventDefault();">
+  <form class="sd-contact-form sd-reveal-right" data-reveal-delay="200" onsubmit="event.preventDefault();">
     <div class="sd-field-group">
       <label for="d-name">Full name</label>
       <input id="d-name" name="name" class="sd-field" type="text" autocomplete="name" required />

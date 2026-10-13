@@ -8,19 +8,19 @@ interface Props {
 const { accent = "#E0A030" } = Astro.props;
 ---
 
-<div class="sd-hero">
+<div class="sd-hero sd-section-track">
   <!-- Dimming overlay -->
   <div class="sd-hero-overlay" aria-hidden="true"></div>
 
   <!-- Ambient glowing color circle with blend mode -->
-  <div class="sd-hero-orb" aria-hidden="true" style={`background: ${accent};`}></div>
+  <div class="sd-hero-orb sd-reveal-right" aria-hidden="true" style={`background: ${accent};`} data-reveal-delay="200"></div>
 
   <!-- Top Nav -->
   <Header />
 
   <!-- Hero Content -->
   <section class="sd-hero-content">
-    <div class="sd-hero-text">
+    <div class="sd-hero-text sd-reveal-left" data-reveal-delay="100">
       <h1 class="sd-hero-title">Suria<br />Design</h1>
       <p class="sd-hero-description">
         Suria Design is a design studio beginning with fine jewelry. We work privately, by referral and appointment.

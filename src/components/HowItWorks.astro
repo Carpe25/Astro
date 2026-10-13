@@ -24,12 +24,12 @@ const steps = [
 ];
 ---
 
-<section aria-labelledby="how" class="sd-how">
+<section aria-labelledby="how" class="sd-how sd-section-track">
   <div class="sd-how-content">
-    <h2 id="how" class="sd-how-heading">How it works</h2>
+    <h2 id="how" class="sd-how-heading sd-reveal-left" data-reveal-delay="100">How it works</h2>
 
-    <ol class="sd-how-list">
-      {steps.map((item) => (
+    <ol class="sd-how-list sd-reveal-right" data-reveal-delay="200">
+      {steps.map((item, index) => (
         <li class="sd-how-step">
           <span class="sd-how-pip" aria-hidden="true" style={`background: ${accent};`}></span>
           <span class="sd-how-step-num">{item.step}</span>

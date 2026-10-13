@@ -8,7 +8,7 @@ interface Props {
 const { accent = ACCENT_COLOR } = Astro.props;
 ---
 
-<section id="work" class="sd-work" style={`--accent-color: ${accent};`}>
+<section id="work" class="sd-work sd-section-track" style={`--accent-color: ${accent};`}>
   <div class="sd-work-content">
     <div 
       class="sd-carousel" 
@@ -18,10 +18,11 @@ const { accent = ACCENT_COLOR } = Astro.props;
     >
     <!-- Left: Image Viewer / Canvas -->
     <div 
-      class="sd-carousel-viewport" 
+      class="sd-carousel-viewport sd-reveal-left" 
       id="carousel-viewport" 
       tabindex="0" 
       aria-label="Jewelry image viewer. Swipe or use arrow keys."
+      data-reveal-delay="100"
     >
       <div class="sd-carousel-track" id="carousel-track">
         <!-- Clone of last piece for continuous looping -->
@@ -63,7 +64,7 @@ const { accent = ACCENT_COLOR } = Astro.props;
     </div>
 
     <!-- Right: Editorial Details & Controls -->
-    <div class="sd-carousel-panel">
+    <div class="sd-carousel-panel sd-reveal-right" data-reveal-delay="200">
       <!-- Section Title & Counter -->
       <div class="sd-carousel-header">
         <h2 class="sd-carousel-title">Selected work</h2>
