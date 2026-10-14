@@ -95,10 +95,86 @@
       filter: blur(0);
     }
 
+    /* Fade in animation (used for selected work) */
+    html.has-motion .sd-reveal-fade {
+      opacity: 0;
+      filter: blur(6px);
+      transform: translateY(12px);
+      transition: opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  filter 1.4s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, filter, transform;
+    }
+
+    html.has-motion .sd-section-track.is-active-view .sd-reveal-fade,
+    html.has-motion .sd-reveal-fade.is-revealed {
+      opacity: 1;
+      filter: blur(0);
+      transform: translateY(0);
+    }
+
+    /* Slower, graceful reveal (used for How it works steps) */
+    html.has-motion .sd-reveal-slow {
+      opacity: 0;
+      transform: translateX(36px);
+      filter: blur(4px);
+      transition: opacity 1.45s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 1.45s cubic-bezier(0.16, 1, 0.3, 1),
+                  filter 1.45s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, transform, filter;
+    }
+
+    html.has-motion .sd-section-track.is-active-view .sd-reveal-slow,
+    html.has-motion .sd-reveal-slow.is-revealed {
+      opacity: 1;
+      transform: translateX(0);
+      filter: blur(0);
+    }
+
+    /* Hero word-by-word reveal */
+    .sd-word-reveal {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(20px);
+      filter: blur(4px);
+      transition: opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 1.1s cubic-bezier(0.16, 1, 0.3, 1),
+                  filter 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+      transition-delay: var(--word-delay, 0ms);
+      will-change: opacity, transform, filter;
+    }
+
+    html.has-motion .sd-hero.is-active-view .sd-word-reveal {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+
+    .sd-hero-actions-reveal {
+      opacity: 0;
+      transform: translateY(16px);
+      filter: blur(3px);
+      transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+                  filter 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+      transition-delay: var(--actions-delay, 2200ms);
+      will-change: opacity, transform, filter;
+    }
+
+    html.has-motion .sd-hero.is-active-view .sd-hero-actions-reveal {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+
     @media (prefers-reduced-motion: reduce) {
       html.has-motion .sd-section-track,
       html.has-motion .sd-reveal-left,
-      html.has-motion .sd-reveal-right {
+      html.has-motion .sd-reveal-right,
+      html.has-motion .sd-reveal-fade,
+      html.has-motion .sd-reveal-slow,
+      .sd-word-reveal,
+      .sd-hero-actions-reveal {
         opacity: 1 !important;
         transform: none !important;
         filter: none !important;
@@ -685,10 +761,15 @@
       </header>
 
       <section class="sd-hero-content">
-        <div class="sd-hero-text sd-reveal-left">
-          <h1 class="sd-hero-title">Suria<br>Design</h1>
-          <p class="sd-hero-description">Suria Design is a design studio beginning with fine jewelry. We work privately, by referral and appointment.</p>
-          <div class="sd-hero-actions">
+        <div class="sd-hero-text">
+          <h1 class="sd-hero-title">
+            <span class="sd-word-reveal" style="--word-delay: 250ms;">Suria</span><br>
+            <span class="sd-word-reveal" style="--word-delay: 600ms;">Design</span>
+          </h1>
+          <p class="sd-hero-description">
+            <span class="sd-word-reveal" style="--word-delay: 900ms;">Suria&nbsp;</span><span class="sd-word-reveal" style="--word-delay: 980ms;">Design&nbsp;</span><span class="sd-word-reveal" style="--word-delay: 1060ms;">is&nbsp;</span><span class="sd-word-reveal" style="--word-delay: 1140ms;">a&nbsp;</span><span class="sd-word-reveal" style="--word-delay: 1220ms;">design&nbsp;</span><span class="sd-word-reveal" style="--word-delay: 1300ms;">studio&nbsp;</span><span class="sd-word-reveal" style="--word-delay: 1380ms;">beginning&nbsp;</span><span class="sd-word-reveal" style="--word-delay: 1460ms;">with&nbsp;</span><span class="sd-word-reveal" style="--word-delay: 1540ms;">fine&nbsp;</span><span class="sd-word-reveal" style="--word-delay: 1620ms;">jewelry.&nbsp;</span><span class="sd-word-reveal" style="--word-delay: 1700ms;">We&nbsp;</span><span class="sd-word-reveal" style="--word-delay: 1780ms;">work&nbsp;</span><span class="sd-word-reveal" style="--word-delay: 1860ms;">privately,&nbsp;</span><span class="sd-word-reveal" style="--word-delay: 1940ms;">by&nbsp;</span><span class="sd-word-reveal" style="--word-delay: 2020ms;">referral&nbsp;</span><span class="sd-word-reveal" style="--word-delay: 2100ms;">and&nbsp;</span><span class="sd-word-reveal" style="--word-delay: 2180ms;">appointment.</span>
+          </p>
+          <div class="sd-hero-actions sd-hero-actions-reveal" style="--actions-delay: 2400ms;">
             <a href="#contact" class="sd-btn-primary">Request an appointment</a>
             <a href="#work" class="sd-btn-link">See selected work</a>
           </div>
@@ -706,7 +787,7 @@
     <section id="work" class="sd-work sd-section-track">
       <div class="sd-carousel" id="suria-carousel" aria-roledescription="carousel" aria-label="Selected pieces">
         <!-- Viewport -->
-        <div class="sd-carousel-viewport sd-reveal-left" id="carousel-viewport" tabindex="0" aria-label="Selected jewelry collection. Drag or click arrows to view.">
+        <div class="sd-carousel-viewport sd-reveal-fade" id="carousel-viewport" tabindex="0" aria-label="Selected jewelry collection. Drag or click arrows to view.">
           <img src="./assets/304be120b386ba9415be91d00c6c35c4.jpg" alt="Yellow gold necklace of emerald-cut stones graded through the rainbow" class="sd-carousel-img is-active" aria-hidden="false" draggable="false">
           <img src="./assets/c471f12e5057e4db028394c77f5d9fc1.jpg" alt="Necklace with five graduated round diamonds" class="sd-carousel-img" aria-hidden="true" draggable="false">
           <img src="./assets/214e92539844b44e12bcf92acf55a30f.jpg" alt="Pendant with a green and a red pear-shaped stone" class="sd-carousel-img" aria-hidden="true" draggable="false">
@@ -718,7 +799,7 @@
         </div>
 
         <!-- Details & Controls -->
-        <div class="sd-carousel-panel sd-reveal-right">
+        <div class="sd-carousel-panel sd-reveal-fade">
           <div class="sd-carousel-header">
             <h2 class="sd-carousel-title">Selected work</h2>
             <span id="carousel-counter" class="sd-carousel-counter" aria-live="polite">01 / 08</span>
@@ -765,21 +846,21 @@
 
     <!-- HOW IT WORKS SECTION -->
     <section aria-labelledby="how" class="sd-how sd-section-track">
-      <h2 id="how" class="sd-how-heading sd-reveal-left">How it works</h2>
-      <ol class="sd-how-list sd-reveal-right">
-        <li class="sd-how-step">
+      <h2 id="how" class="sd-how-heading sd-reveal-left sd-reveal-slow" data-reveal-delay="150">How it works</h2>
+      <ol class="sd-how-list">
+        <li class="sd-how-step sd-reveal-slow" data-reveal-delay="350">
           <span class="sd-how-pip" aria-hidden="true"></span>
           <span class="sd-how-step-num">01</span>
           <span class="sd-how-step-title">Introduction</span>
           <span class="sd-how-step-desc">Clients come to us through someone they know. Tell us who referred you when you get in touch.</span>
         </li>
-        <li class="sd-how-step">
+        <li class="sd-how-step sd-reveal-slow" data-reveal-delay="770">
           <span class="sd-how-pip" aria-hidden="true"></span>
           <span class="sd-how-step-num">02</span>
           <span class="sd-how-step-title">Consultation</span>
           <span class="sd-how-step-desc">A private appointment to talk through what you have in mind, the occasion, and the stones you are drawn to.</span>
         </li>
-        <li class="sd-how-step">
+        <li class="sd-how-step sd-reveal-slow" data-reveal-delay="1190">
           <span class="sd-how-pip" aria-hidden="true"></span>
           <span class="sd-how-step-num">03</span>
           <span class="sd-how-step-title">Design and making</span>
@@ -936,6 +1017,12 @@
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('is-active-view');
+            const children = entry.target.querySelectorAll('.sd-reveal, .sd-reveal-left, .sd-reveal-right, .sd-reveal-fade, .sd-reveal-slow');
+            children.forEach((child) => {
+              const delay = child.getAttribute('data-reveal-delay');
+              if (delay) child.style.transitionDelay = `${delay}ms`;
+              child.classList.add('is-revealed');
+            });
             obs.unobserve(entry.target);
           }
         });

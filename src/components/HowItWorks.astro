@@ -26,11 +26,11 @@ const steps = [
 
 <section aria-labelledby="how" class="sd-how sd-section-track">
   <div class="sd-how-content">
-    <h2 id="how" class="sd-how-heading sd-reveal-left" data-reveal-delay="100">How it works</h2>
+    <h2 id="how" class="sd-how-heading sd-reveal-left sd-reveal-slow" data-reveal-delay="150">How it works</h2>
 
-    <ol class="sd-how-list sd-reveal-right" data-reveal-delay="200">
+    <ol class="sd-how-list">
       {steps.map((item, index) => (
-        <li class="sd-how-step">
+        <li class="sd-how-step sd-reveal-slow" data-reveal-delay={350 + index * 420}>
           <span class="sd-how-pip" aria-hidden="true" style={`background: ${accent};`}></span>
           <span class="sd-how-step-num">{item.step}</span>
           <span class="sd-how-step-title">{item.title}</span>
