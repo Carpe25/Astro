@@ -18,7 +18,7 @@ const { accent = ACCENT_COLOR } = Astro.props;
     >
     <!-- Left: Image Viewer / Canvas -->
     <div 
-      class="sd-carousel-viewport sd-reveal-left" 
+      class="sd-carousel-viewport sd-reveal-fade" 
       id="carousel-viewport" 
       tabindex="0" 
       aria-label="Jewelry image viewer. Swipe or use arrow keys."
@@ -64,7 +64,7 @@ const { accent = ACCENT_COLOR } = Astro.props;
     </div>
 
     <!-- Right: Editorial Details & Controls -->
-    <div class="sd-carousel-panel sd-reveal-right" data-reveal-delay="200">
+    <div class="sd-carousel-panel sd-reveal-fade" data-reveal-delay="250">
       <!-- Section Title & Counter -->
       <div class="sd-carousel-header">
         <h2 class="sd-carousel-title">Selected work</h2>

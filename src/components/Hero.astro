@@ -6,6 +6,10 @@ interface Props {
 }
 
 const { accent = "#E0A030" } = Astro.props;
+
+const titleWords = ["Suria", "Design"];
+const descText = "Suria Design is a design studio beginning with fine jewelry. We work privately, by referral and appointment.";
+const descWords = descText.split(" ");
 ---
 
 <div class="sd-hero sd-section-track">
@@ -20,12 +24,21 @@ const { accent = "#E0A030" } = Astro.props;
 
   <!-- Hero Content -->
   <section class="sd-hero-content">
-    <div class="sd-hero-text sd-reveal-left" data-reveal-delay="100">
-      <h1 class="sd-hero-title">Suria<br />Design</h1>
+    <div class="sd-hero-text">
+      <h1 class="sd-hero-title">
+        {titleWords.map((word, i) => (
+          <>
+            <span class="sd-word-reveal" style={`--word-delay: ${250 + i * 350}ms;`}>{word}</span>
+            {i === 0 && <br />}
+          </>
+        ))}
+      </h1>
       <p class="sd-hero-description">
-        Suria Design is a design studio beginning with fine jewelry. We work privately, by referral and appointment.
+        {descWords.map((word, i) => (
+          <span class="sd-word-reveal" style={`--word-delay: ${900 + i * 85}ms;`}>{word}&nbsp;</span>
+        ))}
       </p>
-      <div class="sd-hero-actions">
+      <div class="sd-hero-actions sd-hero-actions-reveal" style={`--actions-delay: ${900 + descWords.length * 85 + 200}ms;`}>
         <a href="#contact" class="sd-btn-primary">Request an appointment</a>
         <a href="#work" class="sd-btn-link">See selected work</a>
       </div>
