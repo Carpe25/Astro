@@ -6,7 +6,18 @@
   <title>Suria Design — Fine Jewelry Studio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <!-- Synchronous passkey lock check to eliminate any flash of protected content -->
+  <script>
+    (function() {
+      try {
+        if (sessionStorage.getItem('suria_site_authenticated') !== 'true') {
+          document.documentElement.classList.add('sd-locked');
+        }
+      } catch (e) {
+        document.documentElement.classList.add('sd-locked');
+      }
+    })();
+  </script>
   <style>
     :root {
       --sd-accent: #E0A030;
@@ -743,9 +754,318 @@
       .sd-footer { padding: 40px 20px; flex-direction: column; gap: 24px; }
       .sd-footer-policy, .sd-footer-meta { align-self: flex-start; align-items: flex-start; }
     }
+
+    /* Passkey protection & locked states */
+    html.sd-locked, html.sd-locked body {
+      overflow: hidden !important;
+      height: 100vh !important;
+    }
+    html.sd-locked #sd-page-content {
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+      user-select: none !important;
+    }
+    html:not(.sd-locked) #sd-password-gate {
+      display: none !important;
+    }
+    #sd-page-content {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+    .sd-gate-wrapper {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 999999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #2A3036;
+      overflow: hidden;
+      padding: 24px;
+      box-sizing: border-box;
+      transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+                  filter 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, transform, filter;
+    }
+    .sd-gate-wrapper.is-unlocking {
+      opacity: 0;
+      transform: scale(1.02);
+      filter: blur(10px);
+      pointer-events: none;
+    }
+    .sd-gate-wrapper.is-hidden {
+      display: none !important;
+    }
+    .sd-gate-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url(./assets/806408f67066834bd64370cdf37369f2.jpg);
+      background-size: cover;
+      background-position: center 55%;
+      z-index: 0;
+    }
+    .sd-gate-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(22, 27, 32, 0.62);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 1;
+    }
+    .sd-gate-orb {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 440px;
+      height: 440px;
+      border-radius: 50%;
+      filter: blur(140px);
+      opacity: 0.16;
+      background: var(--sd-accent, #E0A030);
+      mix-blend-mode: color;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .sd-gate-container {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 340px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .sd-gate-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+    }
+    .sd-brand-name {
+      font-family: var(--sd-font-sans);
+      font-size: 26px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      color: #F2F3F0;
+    }
+    .sd-brand-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--sd-accent, #E0A030);
+      box-shadow: 0 0 10px currentColor;
+    }
+    .sd-gate-form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .sd-single-box {
+      position: relative;
+      width: 100%;
+      height: 52px;
+      background: rgba(26, 32, 38, 0.65);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(242, 243, 240, 0.22);
+      border-radius: 999px;
+      padding: 4px 6px 4px 20px;
+      display: flex;
+      align-items: center;
+      box-sizing: border-box;
+      box-shadow: 0 10px 32px rgba(0, 0, 0, 0.4);
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+    }
+    .sd-single-box:focus-within {
+      border-color: #E0A030;
+      box-shadow: 0 0 0 3px rgba(224, 160, 48, 0.2), 0 12px 36px rgba(0, 0, 0, 0.45);
+      background: rgba(26, 32, 38, 0.85);
+    }
+    .sd-single-box.is-invalid {
+      border-color: #FF5A5A;
+      box-shadow: 0 0 0 3px rgba(255, 90, 90, 0.22);
+      animation: sd-shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+    @keyframes sd-shake {
+      10%, 90% { transform: translate3d(-1px, 0, 0); }
+      20%, 80% { transform: translate3d(2px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+      40%, 60% { transform: translate3d(4px, 0, 0); }
+    }
+    .sd-pass-input {
+      flex: 1;
+      min-width: 0;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: var(--sd-font-mono);
+      font-size: 14px;
+      color: #F2F3F0;
+      letter-spacing: 0.02em;
+      padding: 0 8px 0 0;
+    }
+    .sd-pass-input::placeholder {
+      color: #8C96A0;
+      font-family: var(--sd-font-sans);
+      font-size: 14px;
+      letter-spacing: 0;
+    }
+    .sd-toggle-btn {
+      background: transparent;
+      border: none;
+      outline: none;
+      padding: 6px;
+      margin-right: 4px;
+      color: #7A848F;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: color 0.2s ease;
+    }
+    .sd-toggle-btn:hover { color: #F2F3F0; }
+    .is-hidden { display: none !important; }
+    .sd-submit-arrow {
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      border: none;
+      outline: none;
+      background: var(--sd-accent, #E0A030);
+      color: #1F262D;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s ease, filter 0.2s ease, background-color 0.2s ease;
+      box-shadow: 0 2px 10px rgba(224, 160, 48, 0.35);
+    }
+    .sd-submit-arrow:hover {
+      transform: scale(1.06);
+      filter: brightness(1.1);
+    }
+    .sd-submit-arrow:active { transform: scale(0.96); }
+    .sd-submit-arrow.is-success {
+      background: #38A169 !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 2px 12px rgba(56, 161, 105, 0.4) !important;
+    }
+    .sd-gate-error {
+      min-height: 22px;
+      font-family: var(--sd-font-sans);
+      font-size: 13px;
+      color: #FF8585;
+      text-align: center;
+      margin-top: 10px;
+      opacity: 0;
+      transform: translateY(-3px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .sd-gate-error.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .sd-footer-lock {
+      background: transparent;
+      border: none;
+      color: #6C7681;
+      font-family: var(--sd-font-mono);
+      font-size: 12px;
+      cursor: pointer;
+      padding: 6px 0;
+      margin-top: 4px;
+      display: inline-flex;
+      align-items: center;
+      transition: color 0.2s ease;
+    }
+    .sd-footer-lock:hover { color: #E8EAE7; }
   </style>
 </head>
 <body>
+  <!-- PASSKEY GATEWAY SCREEN (Single Minimalist Box) -->
+  <div id="sd-password-gate" class="sd-gate-wrapper" aria-modal="true" role="dialog" aria-label="Password entry">
+    <div class="sd-gate-bg" aria-hidden="true"></div>
+    <div class="sd-gate-overlay" aria-hidden="true"></div>
+    <div class="sd-gate-orb" aria-hidden="true"></div>
+
+    <div class="sd-gate-container">
+      <div class="sd-gate-brand">
+        <span class="sd-brand-name">Suria Design</span>
+        <span class="sd-brand-dot"></span>
+      </div>
+
+      <form id="sd-gate-form" class="sd-gate-form" novalidate>
+        <div class="sd-single-box" id="sd-input-wrapper">
+          <input
+            id="sd-passkey-input"
+            type="password"
+            name="passkey"
+            class="sd-pass-input"
+            placeholder="Enter password..."
+            autocomplete="current-password"
+            required
+            spellcheck="false"
+          />
+
+          <button
+            type="button"
+            id="sd-toggle-visibility"
+            class="sd-toggle-btn"
+            aria-label="Toggle password visibility"
+            title="Show / hide password"
+          >
+            <svg id="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <svg id="eye-off-icon" class="is-hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+            </svg>
+          </button>
+
+          <button
+            type="submit"
+            id="sd-gate-submit"
+            class="sd-submit-arrow"
+            aria-label="Submit password"
+            title="Enter studio"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </div>
+
+        <div id="sd-gate-error" class="sd-gate-error" role="alert" aria-live="polite"></div>
+      </form>
+    </div>
+  </div>
+
+  <div id="sd-page-content" class="sd-protected-content">
   <div class="page-container">
     <!-- HERO SECTION -->
     <div class="sd-hero sd-section-track">
@@ -932,8 +1252,16 @@
       <div class="sd-footer-meta sd-reveal-right">
         <a href="mailto:hello@suria.design" class="sd-footer-email">[hello@suria.design]</a>
         <span class="sd-footer-copyright">© 2026 Suria Design</span>
+        <button type="button" id="sd-lock-preview-btn" class="sd-footer-lock" title="Lock the studio with passkey">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          Lock studio preview
+        </button>
       </div>
     </footer>
+  </div>
   </div>
 
   <script>
@@ -1035,6 +1363,119 @@
     } else {
       trackedSections.forEach((sec) => sec.classList.add('is-active-view'));
     }
+
+    // --- Passkey Gateway Controller ---
+    const SITE_PASSWORDS = ['suria', 'suria2026', 'jewel', 'studio'];
+    const STORAGE_KEY = 'suria_site_authenticated';
+
+    const gate = document.getElementById('sd-password-gate');
+    const form = document.getElementById('sd-gate-form');
+    const input = document.getElementById('sd-passkey-input');
+    const inputWrapper = document.getElementById('sd-input-wrapper');
+    const errorBox = document.getElementById('sd-gate-error');
+    const submitBtn = document.getElementById('sd-gate-submit');
+    const btnLabel = submitBtn?.querySelector('.sd-btn-label');
+    const toggleBtn = document.getElementById('sd-toggle-visibility');
+    const eyeIcon = document.getElementById('eye-icon');
+    const eyeOffIcon = document.getElementById('eye-off-icon');
+    const lockBtn = document.getElementById('sd-lock-preview-btn');
+
+    function isAuthed() {
+      try {
+        return sessionStorage.getItem(STORAGE_KEY) === 'true';
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function unlockSite(animated) {
+      document.documentElement.classList.remove('sd-locked');
+      if (animated && gate) {
+        gate.classList.add('is-unlocking');
+        setTimeout(() => {
+          gate.classList.add('is-hidden');
+        }, 750);
+      } else if (gate) {
+        gate.classList.add('is-hidden');
+      }
+
+      // Trigger hero entrance
+      const hero = document.querySelector('.sd-hero');
+      if (hero) {
+        hero.classList.add('is-active-view');
+        const children = hero.querySelectorAll('.sd-reveal, .sd-reveal-left, .sd-reveal-right, .sd-reveal-fade, .sd-reveal-slow');
+        children.forEach((child) => {
+          const delay = child.getAttribute('data-reveal-delay');
+          if (delay) child.style.transitionDelay = `${delay}ms`;
+          child.classList.add('is-revealed');
+        });
+      }
+    }
+
+    if (isAuthed()) {
+      unlockSite(false);
+    } else {
+      setTimeout(() => input?.focus(), 150);
+    }
+
+    toggleBtn?.addEventListener('click', () => {
+      if (!input) return;
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      if (eyeIcon && eyeOffIcon) {
+        if (isPassword) {
+          eyeIcon.classList.add('is-hidden');
+          eyeOffIcon.classList.remove('is-hidden');
+        } else {
+          eyeIcon.classList.remove('is-hidden');
+          eyeOffIcon.classList.add('is-hidden');
+        }
+      }
+      input.focus();
+    });
+
+    input?.addEventListener('input', () => {
+      if (inputWrapper?.classList.contains('is-invalid')) {
+        inputWrapper.classList.remove('is-invalid');
+      }
+      if (errorBox) {
+        errorBox.classList.remove('is-visible');
+        errorBox.textContent = '';
+      }
+    });
+
+    form?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!input) return;
+      const val = input.value.trim().toLowerCase();
+      if (SITE_PASSWORDS.includes(val)) {
+        try { sessionStorage.setItem(STORAGE_KEY, 'true'); } catch (err) {}
+        if (inputWrapper) inputWrapper.classList.remove('is-invalid');
+        if (errorBox) { errorBox.classList.remove('is-visible'); errorBox.textContent = ''; }
+        if (submitBtn) {
+          submitBtn.classList.add('is-success');
+          if (btnLabel) btnLabel.textContent = 'Access Granted ✓';
+        }
+        setTimeout(() => unlockSite(true), 400);
+      } else {
+        if (inputWrapper) {
+          inputWrapper.classList.remove('is-invalid');
+          void inputWrapper.offsetWidth;
+          inputWrapper.classList.add('is-invalid');
+        }
+        if (errorBox) {
+          errorBox.textContent = 'Incorrect passkey. Please check and try again.';
+          errorBox.classList.add('is-visible');
+        }
+        input.select();
+        input.focus();
+      }
+    });
+
+    lockBtn?.addEventListener('click', () => {
+      try { sessionStorage.removeItem(STORAGE_KEY); } catch (e) {}
+      window.location.reload();
+    });
   </script>
 </body>
 </html>

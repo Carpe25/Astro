@@ -1,5 +1,6 @@
 ---
 import 'lenis/dist/lenis.css';
+import PasswordGate from '../components/PasswordGate.astro';
 
 interface Props {
   title?: string;
@@ -18,6 +19,20 @@ const {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
+
+    <!-- Synchronous passkey lock check to eliminate any flash of protected content -->
+    <script is:inline>
+      (function() {
+        try {
+          if (sessionStorage.getItem('suria_site_authenticated') !== 'true') {
+            document.documentElement.classList.add('sd-locked');
+          }
+        } catch (e) {
+          document.documentElement.classList.add('sd-locked');
+        }
+      })();
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -243,10 +258,37 @@ const {
           transition: none !important;
         }
       }
+
+      /* Locked overlay and protected content visibility */
+      html.sd-locked,
+      html.sd-locked body {
+        overflow: hidden !important;
+        height: 100vh !important;
+      }
+
+      html.sd-locked #sd-page-content {
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        user-select: none !important;
+      }
+
+      html:not(.sd-locked) #sd-password-gate {
+        display: none !important;
+      }
+
+      #sd-page-content {
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+      }
     </style>
   </head>
   <body>
-    <slot />
+    <PasswordGate accent={accent} />
+    <div id="sd-page-content" class="sd-protected-content">
+      <slot />
+    </div>
 
     <script>
       import Lenis from 'lenis';
@@ -262,6 +304,31 @@ const {
         smoothWheel: true,
         wheelMultiplier: 1.0,
         touchMultiplier: 1.5,
+      });
+
+      // Pause Lenis if site is locked
+      if (document.documentElement.classList.contains('sd-locked')) {
+        lenis.stop();
+      }
+
+      window.addEventListener('suria:unlocked', () => {
+        lenis.start();
+
+        // Trigger hero reveal immediately upon unlocking
+        const hero = document.querySelector('.sd-hero');
+        if (hero) {
+          hero.classList.add('is-active-view');
+          const children = hero.querySelectorAll(
+            '.sd-reveal, .sd-reveal-left, .sd-reveal-right, .sd-reveal-fade, .sd-reveal-slow'
+          );
+          children.forEach((child) => {
+            const delay = child.getAttribute('data-reveal-delay');
+            if (delay) {
+              (child as HTMLElement).style.transitionDelay = `${delay}ms`;
+            }
+            child.classList.add('is-revealed');
+          });
+        }
       });
 
       // Smooth and slower cinematic scrolling when clicking navigation buttons/links

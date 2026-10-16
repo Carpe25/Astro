@@ -9,9 +9,22 @@
     <div class="sd-footer-meta sd-reveal-right" data-reveal-delay="200">
       <a href="mailto:hello@suria.design" class="sd-footer-email">[hello@suria.design]</a>
       <span class="sd-footer-copyright">© 2026 Suria Design</span>
+      <button type="button" id="sd-lock-preview-btn" class="sd-footer-lock" title="Lock the studio with passkey">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        Lock studio preview
+      </button>
     </div>
   </div>
 </footer>
+
+<script>
+  document.getElementById('sd-lock-preview-btn')?.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('suria:lock'));
+  });
+</script>
 
 <style>
   .sd-footer {
@@ -63,6 +76,24 @@
   .sd-footer-copyright {
     font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
     font-size: 13px;
+  }
+
+  .sd-footer-lock {
+    background: transparent;
+    border: none;
+    color: #6C7681;
+    font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 6px 0;
+    margin-top: 4px;
+    display: inline-flex;
+    align-items: center;
+    transition: color 0.2s ease;
+  }
+
+  .sd-footer-lock:hover {
+    color: #E8EAE7;
   }
 
   @media (max-width: 768px) {
