@@ -6,25 +6,20 @@ import path from 'node:path';
 import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
 import { ACCENT_COLOR } from '../../data/pieces';
+import { isAuthenticated } from '../../lib/auth';
 
 const execAsync = promisify(exec);
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, cookies }) => {
   try {
-    const formData = await request.formData();
-    const password = formData.get('password');
-
-    const expectedPassword =
-      process.env.ADMIN_PASSWORD ||
-      import.meta.env.ADMIN_PASSWORD ||
-      'studio2026';
-
-    if (!password || password !== expectedPassword) {
+    if (!isAuthenticated(cookies)) {
       return new Response(
-        JSON.stringify({ error: 'Incorrect password. Access denied.' }),
+        JSON.stringify({ error: 'Unauthorized or session expired. Please log in again.' }),
         { status: 401, headers: { 'Content-Type': 'application/json' } }
       );
     }
+
+    const formData = await request.formData();
 
     const piecesJson = formData.get('pieces');
     if (!piecesJson || typeof piecesJson !== 'string') {
