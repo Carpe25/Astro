@@ -1,7 +1,5 @@
 import type { AstroCookies } from 'astro';
 import crypto from 'node:crypto';
-import fs from 'node:fs';
-import path from 'node:path';
 
 export const SESSION_COOKIE_NAME = 'sd_admin_session';
 const SESSION_TTL_SECONDS = 24 * 60 * 60; // 24 hours
@@ -14,36 +12,22 @@ interface RateLimitInfo {
 
 const rateLimitMap = new Map<string, RateLimitInfo>();
 
-export function getAdminPassword(): string | null {
-  const envPass = process.env.ADMIN_PASSWORD || (import.meta.env && import.meta.env.ADMIN_PASSWORD);
-  if (envPass && typeof envPass === 'string' && envPass.trim()) {
-    return envPass.trim();
-  }
-
-  // Fallback: Read .env from project root if not populated in process.env
-  try {
-    const envPath = path.resolve(process.cwd(), '.env');
-    if (fs.existsSync(envPath)) {
-      const content = fs.readFileSync(envPath, 'utf-8');
-      const match = content.match(/^\s*ADMIN_PASSWORD\s*=\s*(.*)$/m);
-      if (match && match[1]) {
-        return match[1].trim().replace(/^['"]|['"]$/g, '');
-      }
-    }
-  } catch {
-    // Ignore read errors
-  }
-
-  return null;
+// Vite loads .env into import.meta.env in dev; hosts like Vercel provide process.env
+export function env(name: string): string | null {
+  const value = process.env[name] || import.meta.env[name];
+  return typeof value === 'string' && value.trim() ? value.trim() : null;
 }
 
-function getSecretKey(): string {
-  const secret = process.env.SESSION_SECRET || (import.meta.env && import.meta.env.SESSION_SECRET);
-  if (secret && typeof secret === 'string' && secret.trim()) {
-    return secret.trim();
-  }
-  const adminPass = getAdminPassword() || 'sd_default_secure_admin_key_2026';
-  return crypto.createHash('sha256').update(`${adminPass}::sd_salt_key`).digest('hex');
+export function getAdminPassword(): string | null {
+  return env('ADMIN_PASSWORD');
+}
+
+// No password and no secret = no valid sessions (never fall back to a known key)
+function getSecretKey(): string | null {
+  const secret = env('SESSION_SECRET');
+  if (secret) return secret;
+  const adminPass = getAdminPassword();
+  return adminPass ? crypto.createHash('sha256').update(`${adminPass}::sd_salt_key`).digest('hex') : null;
 }
 
 export function checkRateLimit(ip: string): { allowed: boolean; waitSeconds?: number } {
@@ -103,7 +87,9 @@ export function createSessionToken(): string {
   const expiresAt = Date.now() + SESSION_TTL_SECONDS * 1000;
   const nonce = crypto.randomBytes(16).toString('hex');
   const data = `${expiresAt}.${nonce}`;
-  const signature = crypto.createHmac('sha256', getSecretKey()).update(data).digest('hex');
+  const key = getSecretKey();
+  if (!key) throw new Error('ADMIN_PASSWORD or SESSION_SECRET must be set');
+  const signature = crypto.createHmac('sha256', key).update(data).digest('hex');
   return `${data}.${signature}`;
 }
 
@@ -124,8 +110,13 @@ export function verifySessionToken(token: string | undefined): boolean {
     return false;
   }
 
+  const key = getSecretKey();
+  if (!key) {
+    return false;
+  }
+
   const data = `${expiresAtStr}.${nonce}`;
-  const expectedSig = crypto.createHmac('sha256', getSecretKey()).update(data).digest('hex');
+  const expectedSig = crypto.createHmac('sha256', key).update(data).digest('hex');
 
   const sigBuf = Buffer.from(signature, 'hex');
   const expectedBuf = Buffer.from(expectedSig, 'hex');

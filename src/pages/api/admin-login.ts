@@ -12,8 +12,8 @@ import {
 
 export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
   try {
-    const forwarded = request.headers.get('x-forwarded-for');
-    const ip = (forwarded ? forwarded.split(',')[0].trim() : clientAddress) || '127.0.0.1';
+    // Never read x-forwarded-for directly: clients can spoof it to dodge the lockout
+    const ip = clientAddress || '127.0.0.1';
 
     // Check rate limit
     const rateCheck = checkRateLimit(ip);
@@ -32,16 +32,8 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
       );
     }
 
-    let password = '';
-    const contentType = request.headers.get('content-type') || '';
-
-    if (contentType.includes('application/json')) {
-      const body = await request.json();
-      password = body.password || '';
-    } else {
-      const formData = await request.formData();
-      password = (formData.get('password') as string) || '';
-    }
+    const body = await request.json().catch(() => ({}));
+    const password = typeof body.password === 'string' ? body.password : '';
 
     if (!password) {
       return new Response(
@@ -83,9 +75,10 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
       JSON.stringify({ success: true, message: 'Authentication successful.' }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     );
-  } catch (err: any) {
+  } catch (err) {
+    console.error('admin-login failed:', err);
     return new Response(
-      JSON.stringify({ error: err.message || 'Server error during authentication.' }),
+      JSON.stringify({ error: 'Server error during authentication.' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }

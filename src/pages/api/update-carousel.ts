@@ -1,120 +1,111 @@
 export const prerender = false;
 
 import type { APIRoute } from 'astro';
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import { exec } from 'node:child_process';
-import { promisify } from 'node:util';
-import { ACCENT_COLOR } from '../../data/pieces';
-import { isAuthenticated } from '../../lib/auth';
+import { ACCENT_COLOR, PIECES, type JewelryPiece } from '../../data/pieces';
+import { env, isAuthenticated } from '../../lib/auth';
 
-const execAsync = promisify(exec);
+// Saves go straight to GitHub as one commit; the host (Vercel) redeploys from it.
+// Works the same locally and on serverless, where the disk is read-only and there is no git.
+
+const ALLOWED_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp']);
+// Vercel rejects request bodies over 4.5 MB, so cap the whole save below that
+const MAX_TOTAL_UPLOAD_BYTES = 4 * 1024 * 1024;
+
+// Known protected images that should never be deleted automatically (e.g. Hero background)
+const PROTECTED_IMAGES = new Set(['806408f67066834bd64370cdf37369f2.jpg', 'placeholder.svg']);
+
+function jsonError(error: string, status: number): Response {
+  return new Response(JSON.stringify({ error }), { status, headers: { 'Content-Type': 'application/json' } });
+}
+
+const extname = (name: string) => (name.match(/\.[^./]+$/)?.[0] ?? '').toLowerCase();
+const basename = (p: string) => p.split('/').pop() ?? '';
+
+async function github(repo: string, token: string, apiPath: string, init: { method?: string; body?: unknown } = {}) {
+  const res = await fetch(`https://api.github.com/repos/${repo}${apiPath}`, {
+    method: init.method ?? 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/vnd.github+json',
+      'Content-Type': 'application/json',
+    },
+    body: init.body === undefined ? undefined : JSON.stringify(init.body),
+  });
+  if (!res.ok) {
+    throw new Error(`GitHub ${init.method ?? 'GET'} ${apiPath} failed: ${res.status} ${await res.text()}`);
+  }
+  return res.json();
+}
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   try {
     if (!isAuthenticated(cookies)) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized or session expired. Please log in again.' }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } }
-      );
+      return jsonError('Unauthorized or session expired. Please log in again.', 401);
+    }
+
+    const token = env('GITHUB_TOKEN');
+    const repo = env('GITHUB_REPO');
+    const branch = env('GITHUB_BRANCH') ?? 'main';
+    if (!token || !repo) {
+      return jsonError('Saving is not configured: set GITHUB_TOKEN and GITHUB_REPO on the server.', 500);
     }
 
     const formData = await request.formData();
 
     const piecesJson = formData.get('pieces');
     if (!piecesJson || typeof piecesJson !== 'string') {
-      return new Response(
-        JSON.stringify({ error: 'Missing pieces data.' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
+      return jsonError('Missing pieces data.', 400);
     }
 
-    let pieces: Array<{
-      id: string;
-      name: string;
-      code: string;
-      desc: string;
-      image: string;
-      alt: string;
-    }>;
-
+    let pieces: JewelryPiece[];
     try {
       pieces = JSON.parse(piecesJson);
     } catch {
-      return new Response(
-        JSON.stringify({ error: 'Invalid pieces JSON format.' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
+      return jsonError('Invalid pieces JSON format.', 400);
+    }
+    if (!Array.isArray(pieces)) {
+      return jsonError('Invalid pieces JSON format.', 400);
     }
 
-    const publicAssetsDir = path.resolve(process.cwd(), 'public/assets');
-    const rootAssetsDir = path.resolve(process.cwd(), 'assets');
-    await fs.mkdir(publicAssetsDir, { recursive: true });
-    await fs.mkdir(rootAssetsDir, { recursive: true });
-
-    // Known protected images that should never be deleted automatically (e.g. Hero background)
-    const protectedImages = new Set([
-      '806408f67066834bd64370cdf37369f2.jpg',
-      'placeholder.svg',
-      'placeholder.jpg',
-      'placeholder.png'
-    ]);
-
-    const imagesToDelete = new Set<string>();
-
-    // Inspect previous pieces.ts to identify any orphaned images from replaced/deleted pieces
-    const piecesFilePath = path.resolve(process.cwd(), 'src/data/pieces.ts');
-    try {
-      const prevContent = await fs.readFile(piecesFilePath, 'utf-8');
-      const match = prevContent.match(/export const PIECES: JewelryPiece\[\] = (\[[\s\S]*?\]);/);
-      if (match) {
-        const prevPieces = JSON.parse(match[1]);
-        if (Array.isArray(prevPieces)) {
-          for (const prev of prevPieces) {
-            if (prev.image) {
-              const base = path.basename(prev.image);
-              if (base && !protectedImages.has(base)) {
-                imagesToDelete.add(base);
-              }
-            }
-          }
-        }
+    // Validate every upload before touching GitHub.
+    // Only real images: an uploaded .html/.svg in public/ would run script on our origin.
+    let totalBytes = 0;
+    for (let i = 0; i < pieces.length; i++) {
+      const file = formData.get(`image_${i}`);
+      if (!(file instanceof File) || file.size === 0) continue;
+      if (!ALLOWED_EXTENSIONS.has(extname(file.name)) || !file.type.startsWith('image/')) {
+        return jsonError(`Image ${i + 1}: only JPG, PNG or WEBP files are allowed.`, 400);
       }
-    } catch {
-      // Continue if reading previous file fails
+      totalBytes += file.size;
+    }
+    if (totalBytes > MAX_TOTAL_UPLOAD_BYTES) {
+      return jsonError('Uploaded images add up to more than 4 MB. Save fewer at a time or use smaller files.', 400);
     }
 
-    // Process each piece and any uploaded image files
+    const tree: Array<{ path: string; mode: '100644'; type: 'blob'; sha?: string | null; content?: string }> = [];
+
+    // Images used by the currently deployed pieces are deletion candidates until reused below
+    const imagesToDelete = new Set<string>();
+    for (const prev of PIECES) {
+      const base = basename(prev.image || '');
+      if (base && !PROTECTED_IMAGES.has(base)) imagesToDelete.add(base);
+    }
+
     for (let i = 0; i < pieces.length; i++) {
       const piece = pieces[i];
-      const uploadedFile = formData.get(`image_${i}`) as File | null;
+      const file = formData.get(`image_${i}`);
 
-      if (uploadedFile && uploadedFile.size > 0) {
-        // Track the previous image being replaced
-        if (piece.image && typeof piece.image === 'string') {
-          const oldFilename = path.basename(piece.image);
-          if (oldFilename && !protectedImages.has(oldFilename)) {
-            imagesToDelete.add(oldFilename);
-          }
-        }
-
-        const origExt = path.extname(uploadedFile.name) || '.jpg';
-        const cleanCode = (piece.code || `piece-${i}`)
-          .toLowerCase()
-          .replace(/[^a-z0-9]/g, '');
-        const filename = `${cleanCode}-${Date.now()}${origExt}`;
-        const publicFilePath = path.join(publicAssetsDir, filename);
-        const rootFilePath = path.join(rootAssetsDir, filename);
-
-        const arrayBuffer = await uploadedFile.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-        await fs.writeFile(publicFilePath, buffer);
-        await fs.writeFile(rootFilePath, buffer);
-
+      if (file instanceof File && file.size > 0) {
+        const cleanCode = (piece.code || `piece-${i}`).toLowerCase().replace(/[^a-z0-9]/g, '');
+        const filename = `${cleanCode}-${Date.now()}${extname(file.name)}`;
+        const blob = await github(repo, token, '/git/blobs', {
+          method: 'POST',
+          body: { content: Buffer.from(await file.arrayBuffer()).toString('base64'), encoding: 'base64' },
+        });
+        tree.push({ path: `public/assets/${filename}`, mode: '100644', type: 'blob', sha: blob.sha });
         piece.image = `/assets/${filename}`;
       }
 
-      // Ensure piece has an ID
       if (!piece.id) {
         piece.id = piece.code || `piece-${i}`;
       }
@@ -122,28 +113,23 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
     // Preserve any image that is still used by any piece in the updated list
     for (const piece of pieces) {
-      if (piece.image) {
-        const basename = path.basename(piece.image);
-        imagesToDelete.delete(basename);
-      }
+      imagesToDelete.delete(basename(piece.image || ''));
     }
 
-    // Delete old replaced/removed images from both public/assets and assets
+    // Only delete files that really exist on the branch (GitHub rejects deleting missing paths)
+    const existing: Array<{ name: string }> = await github(repo, token, `/contents/public/assets?ref=${encodeURIComponent(branch)}`);
+    const existingNames = new Set(existing.map((f) => f.name));
     for (const filename of imagesToDelete) {
-      try {
-        await fs.unlink(path.join(publicAssetsDir, filename));
-      } catch {
-        // Ignore if file doesn't exist
-      }
-      try {
-        await fs.unlink(path.join(rootAssetsDir, filename));
-      } catch {
-        // Ignore if file doesn't exist
+      if (existingNames.has(filename)) {
+        tree.push({ path: `public/assets/${filename}`, mode: '100644', type: 'blob', sha: null });
       }
     }
 
-    // Format new src/data/pieces.ts content
-    const piecesTsContent = `export interface JewelryPiece {
+    tree.push({
+      path: 'src/data/pieces.ts',
+      mode: '100644',
+      type: 'blob',
+      content: `export interface JewelryPiece {
   id: string;
   name: string;
   code: string;
@@ -155,44 +141,34 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 export const PIECES: JewelryPiece[] = ${JSON.stringify(pieces, null, 2)};
 
 export const ACCENT_COLOR = ${JSON.stringify(ACCENT_COLOR || '#E0A030')};
-`;
+`,
+    });
 
-    await fs.writeFile(piecesFilePath, piecesTsContent, 'utf-8');
+    // One commit for everything: new tree on top of the branch head, then move the branch
+    const ref = await github(repo, token, `/git/ref/heads/${branch}`);
+    const headSha: string = ref.object.sha;
+    const headCommit = await github(repo, token, `/git/commits/${headSha}`);
+    const newTree = await github(repo, token, '/git/trees', {
+      method: 'POST',
+      body: { base_tree: headCommit.tree.sha, tree },
+    });
 
-    // Perform Git Commit
-    let gitMessage = 'Changes saved locally.';
-    try {
-      await execAsync('git add assets public/assets src/data/pieces.ts');
-      
-      // Detect currently active branch
-      let currentBranch = 'main';
-      try {
-        const { stdout: branchOut } = await execAsync('git rev-parse --abbrev-ref HEAD');
-        currentBranch = branchOut.trim() || 'main';
-      } catch {
-        // fallback to main
-      }
-
-      // Check if there are staged changes
-      const { stdout: statusOut } = await execAsync('git diff --staged --name-only');
-      if (statusOut.trim().length > 0) {
-        await execAsync(
-          'git commit --author="Suria Admin <admin@suriadesign.local>" -m "chore(carousel): update pieces via admin form"'
-        );
-        gitMessage = `Committed changes to branch '${currentBranch}'.`;
-
-        // Attempt git push to the active branch
-        try {
-          await execAsync(`git push -u origin ${currentBranch}`);
-          gitMessage = `Committed and pushed to branch '${currentBranch}' successfully.`;
-        } catch (pushErr: any) {
-          gitMessage = `Committed to '${currentBranch}' locally. (Push notice: ${pushErr.message || 'push failed or remote not reachable'})`;
-        }
-      } else {
-        gitMessage = `No changes detected between submitted data and existing files on branch '${currentBranch}'.`;
-      }
-    } catch (gitErr: any) {
-      gitMessage = `Files saved, but git error occurred: ${gitErr.message}`;
+    let gitMessage = `No changes detected on branch '${branch}'.`;
+    if (newTree.sha !== headCommit.tree.sha) {
+      const commit = await github(repo, token, '/git/commits', {
+        method: 'POST',
+        body: {
+          message: 'chore(carousel): update pieces via admin form',
+          tree: newTree.sha,
+          parents: [headSha],
+          author: { name: 'Suria Admin', email: 'admin@suriadesign.local' },
+        },
+      });
+      await github(repo, token, `/git/refs/heads/${branch}`, {
+        method: 'PATCH',
+        body: { sha: commit.sha },
+      });
+      gitMessage = `Committed to GitHub branch '${branch}'. The live site updates after the next deploy (about a minute).`;
     }
 
     return new Response(
@@ -204,10 +180,8 @@ export const ACCENT_COLOR = ${JSON.stringify(ACCENT_COLOR || '#E0A030')};
       }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     );
-  } catch (err: any) {
-    return new Response(
-      JSON.stringify({ error: err.message || 'Server error updating carousel' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+  } catch (err) {
+    console.error('update-carousel failed:', err);
+    return jsonError('Server error updating carousel. Check the server log.', 500);
   }
 };
