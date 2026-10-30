@@ -69,7 +69,7 @@ export const PIECES: JewelryPiece[] = [
     "name": "Hammered solitaire",
     "code": "UD1245",
     "desc": "An oval diamond on a wide band of hammered yellow gold.",
-    "image": "/assets/ud1245-1793346718118.png",
+    "image": "/assets/ud1245-1793346873717.jpg",
     "alt": "Hammered yellow gold ring with an oval diamond"
   }
 ];
