@@ -146,5 +146,9 @@ export function setAuthCookie(cookies: AstroCookies, token: string): void {
 export function clearAuthCookie(cookies: AstroCookies): void {
   cookies.delete(SESSION_COOKIE_NAME, {
     path: '/',
+    httpOnly: true,
+    secure: import.meta.env.PROD,
+    sameSite: 'lax',
   });
 }
+

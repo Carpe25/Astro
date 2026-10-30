@@ -5,4 +5,7 @@ import vercel from '@astrojs/vercel';
 // Static by default; pages/API routes with `prerender = false` run as Vercel functions
 export default defineConfig({
   adapter: vercel(),
+  security: {
+    checkOrigin: false,
+  },
 });
