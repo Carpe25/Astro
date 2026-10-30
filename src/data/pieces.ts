@@ -71,14 +71,6 @@ export const PIECES: JewelryPiece[] = [
     "desc": "An oval diamond on a wide band of hammered yellow gold.",
     "image": "/assets/ud1245-1793347787676.jpg",
     "alt": "Hammered yellow gold ring with an oval diamond"
-  },
-  {
-    "id": "UD6624",
-    "name": "New fine jewelry piece",
-    "code": "UD3702",
-    "desc": "Handcrafted in 18k yellow gold featuring natural gemstones...",
-    "image": "/assets/ud3702-1793354678828.webp",
-    "alt": "Handcrafted jewelry piece description"
   }
 ];
 
