@@ -1045,8 +1045,84 @@ const currentBranch = env('GITHUB_BRANCH') ?? 'main';
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function padSlot(num) {
-          return num < 10 ? `0${num}` : `${num}`;
+        function formatBytes(bytes) {
+          if (!bytes || bytes <= 0) return '0 B';
+          const k = 1024;
+          const sizes = ['B', 'KB', 'MB', 'GB'];
+          const i = Math.floor(Math.log(bytes) / Math.log(k));
+          return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        async function compressImage(file, maxDimension = 1600, quality = 0.82) {
+          if (!file || !file.type.startsWith('image/') || file.type === 'image/svg+xml') {
+            return file;
+          }
+
+          return new Promise((resolve) => {
+            const img = new Image();
+            const objectUrl = URL.createObjectURL(file);
+
+            img.onload = () => {
+              URL.revokeObjectURL(objectUrl);
+
+              let width = img.naturalWidth || img.width;
+              let height = img.naturalHeight || img.height;
+
+              // If already small enough in dimensions and size (< 500KB), keep original
+              if (width <= maxDimension && height <= maxDimension && file.size < 500 * 1024) {
+                return resolve(file);
+              }
+
+              // Calculate proportional scale
+              if (width > maxDimension || height > maxDimension) {
+                if (width > height) {
+                  height = Math.round((height * maxDimension) / width);
+                  width = maxDimension;
+                } else {
+                  width = Math.round((width * maxDimension) / height);
+                  height = maxDimension;
+                }
+              }
+
+              const canvas = document.createElement('canvas');
+              canvas.width = width;
+              canvas.height = height;
+
+              const ctx = canvas.getContext('2d');
+              if (!ctx) {
+                return resolve(file);
+              }
+
+              ctx.imageSmoothingEnabled = true;
+              ctx.imageSmoothingQuality = 'high';
+              ctx.drawImage(img, 0, 0, width, height);
+
+              canvas.toBlob(
+                (blob) => {
+                  if (!blob || blob.size >= file.size) {
+                    return resolve(file);
+                  }
+
+                  const baseName = file.name.replace(/\.[^./]+$/, '') || 'image';
+                  const compressedFile = new File([blob], `${baseName}.webp`, {
+                    type: 'image/webp',
+                    lastModified: Date.now(),
+                  });
+
+                  resolve(compressedFile);
+                },
+                'image/webp',
+                quality
+              );
+            };
+
+            img.onerror = () => {
+              URL.revokeObjectURL(objectUrl);
+              resolve(file);
+            };
+
+            img.src = objectUrl;
+          });
         }
 
         function renderPieces() {
@@ -1211,14 +1287,27 @@ const currentBranch = env('GITHUB_BRANCH') ?? 'main';
 
             previewWrapper.addEventListener('click', () => fileInput.click());
 
+            async function stageSelectedFile(file) {
+              if (!file || !file.type.startsWith('image/')) return;
+              fileHint.innerHTML = `<span class="chip-path">⏳ Compressing image...</span>`;
+              fileHint.classList.add('is-new');
+
+              const originalSize = file.size;
+              const compressed = await compressImage(file);
+              pendingFiles.set(index, compressed);
+              imgPreview.src = URL.createObjectURL(compressed);
+
+              const sizeNote = compressed.size < originalSize
+                ? `${formatBytes(originalSize)} → ${formatBytes(compressed.size)}`
+                : formatBytes(compressed.size);
+
+              fileHint.innerHTML = `<span class="chip-path" title="${escapeHtml(compressed.name)}">✓ Staged: ${escapeHtml(compressed.name)} (${sizeNote})</span>`;
+              fileHint.classList.add('is-new');
+            }
+
             fileInput.addEventListener('change', (e) => {
-              const file = e.target.files[0];
-              if (file) {
-                pendingFiles.set(index, file);
-                imgPreview.src = URL.createObjectURL(file);
-                fileHint.innerHTML = `<span class="chip-path">✓ Staged: ${escapeHtml(file.name)}</span>`;
-                fileHint.classList.add('is-new');
-              }
+              const file = e.target.files?.[0];
+              if (file) stageSelectedFile(file);
             });
 
             // Drag and drop events
@@ -1232,12 +1321,9 @@ const currentBranch = env('GITHUB_BRANCH') ?? 'main';
             previewWrapper.addEventListener('drop', (e) => {
               e.preventDefault();
               previewWrapper.classList.remove('is-dragover');
-              const file = e.dataTransfer?.files[0];
+              const file = e.dataTransfer?.files?.[0];
               if (file && file.type.startsWith('image/')) {
-                pendingFiles.set(index, file);
-                imgPreview.src = URL.createObjectURL(file);
-                fileHint.innerHTML = `<span class="chip-path">✓ Staged: ${escapeHtml(file.name)}</span>`;
-                fileHint.classList.add('is-new');
+                stageSelectedFile(file);
               }
             });
 
@@ -1340,6 +1426,15 @@ const currentBranch = env('GITHUB_BRANCH') ?? 'main';
           showStatus('⏳ Uploading staged images, updating <code>src/data/pieces.ts</code>, and committing changes...', 'loading');
 
           try {
+            let totalUploadBytes = 0;
+            pendingFiles.forEach((file) => {
+              totalUploadBytes += file.size;
+            });
+
+            if (totalUploadBytes > 3.5 * 1024 * 1024) {
+              throw new Error(`Total upload size is ${formatBytes(totalUploadBytes)}, which exceeds the safe 3.5 MB limit. Please save in smaller batches.`);
+            }
+
             const formData = new FormData();
             formData.append('pieces', JSON.stringify(pieces));
 
@@ -1353,7 +1448,19 @@ const currentBranch = env('GITHUB_BRANCH') ?? 'main';
               body: formData,
             });
 
-            const data = await res.json();
+            const textResponse = await res.text();
+            let data = null;
+            try {
+              data = JSON.parse(textResponse);
+            } catch {
+              if (res.status === 413) {
+                throw new Error('Upload payload too large for the server (413). Try saving fewer images at once.');
+              }
+              if (res.status === 403) {
+                throw new Error('Server returned 403 Forbidden. Check origin security settings or GitHub token permissions.');
+              }
+              throw new Error(`Server returned HTTP ${res.status}: ${textResponse.slice(0, 150) || 'Unknown response'}`);
+            }
 
             if (!res.ok) {
               if (res.status === 401) {
@@ -1361,7 +1468,7 @@ const currentBranch = env('GITHUB_BRANCH') ?? 'main';
                 window.location.reload();
                 return;
               }
-              throw new Error(data.error || 'Failed to update carousel.');
+              throw new Error(data?.error || 'Failed to update carousel.');
             }
 
             // Update local state with any new image paths
