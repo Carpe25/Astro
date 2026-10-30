@@ -32,7 +32,8 @@ const { accent = ACCENT_COLOR } = Astro.props;
             alt={PIECES[PIECES.length - 1].alt}
             class="sd-carousel-img"
             draggable="false"
-            loading="lazy"
+            loading="eager"
+            decoding="async"
           />
         </div>
 
@@ -45,7 +46,9 @@ const { accent = ACCENT_COLOR } = Astro.props;
               class={`sd-carousel-img ${index === 0 ? 'is-active' : ''}`}
               aria-hidden={index === 0 ? "false" : "true"}
               draggable="false"
-              loading={index === 0 ? "eager" : "lazy"}
+              loading="eager"
+              decoding="async"
+              fetchpriority={index === 0 ? "high" : "auto"}
             />
           </div>
         ))}
@@ -57,7 +60,8 @@ const { accent = ACCENT_COLOR } = Astro.props;
             alt={PIECES[0].alt}
             class="sd-carousel-img"
             draggable="false"
-            loading="lazy"
+            loading="eager"
+            decoding="async"
           />
         </div>
       </div>

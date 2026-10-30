@@ -1045,6 +1045,10 @@ const currentBranch = env('GITHUB_BRANCH') ?? 'main';
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        function padSlot(num) {
+          return num < 10 ? `0${num}` : `${num}`;
+        }
+
         function formatBytes(bytes) {
           if (!bytes || bytes <= 0) return '0 B';
           const k = 1024;
