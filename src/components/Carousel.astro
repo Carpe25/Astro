@@ -14,129 +14,165 @@ const { accent = ACCENT_COLOR } = Astro.props;
       class="sd-carousel" 
       id="suria-carousel" 
       aria-roledescription="carousel" 
-      aria-label="Selected pieces"
+      aria-label="Selected jewelry pieces"
     >
-    <!-- Left: Image Viewer / Canvas -->
-    <div 
-      class="sd-carousel-viewport sd-reveal-fade" 
-      id="carousel-viewport" 
-      tabindex="0" 
-      aria-label="Jewelry image viewer. Swipe or use arrow keys."
-      data-reveal-delay="100"
-    >
-      <div class="sd-carousel-track" id="carousel-track">
-        <!-- Clone of last piece for continuous looping -->
-        <div class="sd-carousel-slide" aria-hidden="true">
-          <img
-            src={PIECES[PIECES.length - 1].image}
-            alt={PIECES[PIECES.length - 1].alt}
-            class="sd-carousel-img"
-            draggable="false"
-            loading="eager"
-            decoding="async"
-          />
-        </div>
-
-        {PIECES.map((piece, index) => (
-          <div class="sd-carousel-slide" data-index={index}>
+      <!-- Left: Image Viewer / Canvas -->
+      <div 
+        class="sd-carousel-viewport sd-reveal-fade" 
+        id="carousel-viewport" 
+        tabindex="0" 
+        aria-label="Jewelry image viewer. Swipe or use arrow keys."
+        data-reveal-delay="100"
+      >
+        <div class="sd-carousel-track" id="carousel-track">
+          <!-- Clone of last piece for continuous looping -->
+          <div class="sd-carousel-slide" aria-hidden="true">
             <img
-              src={piece.image}
-              alt={piece.alt}
-              id={`slide-img-${index}`}
-              class={`sd-carousel-img ${index === 0 ? 'is-active' : ''}`}
-              aria-hidden={index === 0 ? "false" : "true"}
+              src={PIECES[PIECES.length - 1].image}
+              srcset={PIECES[PIECES.length - 1].srcset}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 733px"
+              alt=""
+              class="sd-carousel-img"
               draggable="false"
-              loading="eager"
+              loading="lazy"
               decoding="async"
-              fetchpriority={index === 0 ? "high" : "auto"}
+              width="1200"
+              height="1600"
             />
           </div>
-        ))}
 
-        <!-- Clone of first piece for continuous looping -->
-        <div class="sd-carousel-slide" aria-hidden="true">
-          <img
-            src={PIECES[0].image}
-            alt={PIECES[0].alt}
-            class="sd-carousel-img"
-            draggable="false"
-            loading="eager"
-            decoding="async"
-          />
-        </div>
-      </div>
-    </div>
-
-    <!-- Right: Editorial Details & Controls -->
-    <div class="sd-carousel-panel sd-reveal-fade" data-reveal-delay="250">
-      <!-- Section Title & Counter -->
-      <div class="sd-carousel-header">
-        <h2 class="sd-carousel-title">Selected work</h2>
-        <span 
-          id="carousel-counter" 
-          class="sd-carousel-counter" 
-          aria-live="polite"
-        >
-          01 / 0{PIECES.length}
-        </span>
-      </div>
-
-      <!-- Current Piece Details -->
-      <div class="sd-piece-details" id="piece-details">
-        <h3 id="piece-name" class="sd-piece-name">{PIECES[0].name}</h3>
-        <span id="piece-code" class="sd-piece-code">{PIECES[0].code}</span>
-        <p id="piece-desc" class="sd-piece-desc">{PIECES[0].desc}</p>
-      </div>
-
-      <!-- Segment Progress & Controls -->
-      <div class="sd-carousel-controls">
-        <!-- Segments -->
-        <div class="sd-segments" role="tablist" aria-label="Slides">
           {PIECES.map((piece, index) => (
-            <button
-              type="button"
-              class={`sd-segment-btn ${index === 0 ? 'is-active' : ''}`}
-              id={`segment-btn-${index}`}
-              role="tab"
-              aria-selected={index === 0 ? "true" : "false"}
-              aria-label={`Show ${piece.name}`}
-              data-index={index}
-            >
-              <span class="sd-segment-bar"></span>
-            </button>
+            <div class="sd-carousel-slide" data-index={index}>
+              <img
+                src={piece.image}
+                srcset={piece.srcset}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 733px"
+                alt={piece.alt}
+                id={`slide-img-${index}`}
+                class={`sd-carousel-img ${index === 0 ? 'is-active' : ''}`}
+                aria-hidden={index === 0 ? "false" : "true"}
+                draggable="false"
+                loading={index < 2 ? "eager" : "lazy"}
+                decoding="async"
+                fetchpriority={index === 0 ? "high" : "auto"}
+                width="1200"
+                height="1600"
+              />
+            </div>
           ))}
+
+          <!-- Clone of first piece for continuous looping -->
+          <div class="sd-carousel-slide" aria-hidden="true">
+            <img
+              src={PIECES[0].image}
+              srcset={PIECES[0].srcset}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 733px"
+              alt=""
+              class="sd-carousel-img"
+              draggable="false"
+              loading="lazy"
+              decoding="async"
+              width="1200"
+              height="1600"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Editorial Details & Controls -->
+      <div class="sd-carousel-panel sd-reveal-fade" data-reveal-delay="250">
+        <!-- Section Title & Counter -->
+        <div class="sd-carousel-header">
+          <h2 class="sd-carousel-title">Selected work</h2>
+          <span 
+            id="carousel-counter" 
+            class="sd-carousel-counter" 
+            aria-live="polite"
+          >
+            01 / {PIECES.length < 10 ? `0${PIECES.length}` : PIECES.length}
+          </span>
         </div>
 
-        <!-- Arrows & Lookbook link -->
-        <div class="sd-nav-row">
-          <div class="sd-nav-arrows">
-            <button 
-              type="button" 
-              id="carousel-prev" 
-              class="sd-nav-btn" 
-              aria-label="Previous piece"
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                <path d="M12.5 4.5L7 10l5.5 5.5"></path>
-              </svg>
-            </button>
-            <button 
-              type="button" 
-              id="carousel-next" 
-              class="sd-nav-btn" 
-              aria-label="Next piece"
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                <path d="M7.5 4.5L13 10l-5.5 5.5"></path>
-              </svg>
-            </button>
+        <!-- Current Piece Details -->
+        <div class="sd-piece-details" id="piece-details">
+          <div class="sd-piece-meta">
+            <span id="piece-code" class="sd-piece-code">{PIECES[0].code}</span>
+            {PIECES[0].category && (
+              <>
+                <span class="sd-piece-meta-dot" aria-hidden="true">•</span>
+                <span id="piece-category" class="sd-piece-category">{PIECES[0].category}</span>
+              </>
+            )}
+          </div>
+          <h3 id="piece-name" class="sd-piece-name">{PIECES[0].name}</h3>
+          <p id="piece-desc" class="sd-piece-desc">{PIECES[0].desc}</p>
+        </div>
+
+        <!-- Segment Progress & Controls -->
+        <div class="sd-carousel-controls">
+          <!-- Desktop Segments -->
+          <div class="sd-segments" role="tablist" aria-label="Carousel slide segments">
+            {PIECES.map((piece, index) => (
+              <button
+                type="button"
+                class={`sd-segment-btn ${index === 0 ? 'is-active' : ''}`}
+                id={`segment-btn-${index}`}
+                role="tab"
+                aria-selected={index === 0 ? "true" : "false"}
+                aria-label={`Show ${piece.name}`}
+                data-index={index}
+              >
+                <span class="sd-segment-bar"></span>
+              </button>
+            ))}
           </div>
 
-          <a href="#contact" class="sd-lookbook-link">Ask for the full lookbook</a>
+          <!-- Mobile Responsive Progress Indicator -->
+          <div 
+            class="sd-mobile-progress" 
+            role="progressbar" 
+            aria-label="Carousel slide progress"
+            aria-valuemin="1" 
+            aria-valuemax={PIECES.length} 
+            aria-valuenow="1"
+          >
+            <div 
+              class="sd-mobile-progress-bar" 
+              id="mobile-progress-bar" 
+              style={`width: ${(1 / PIECES.length) * 100}%;`}
+            ></div>
+          </div>
+
+          <!-- Navigation Controls & Lookbook Link -->
+          <div class="sd-nav-row">
+            <div class="sd-nav-arrows">
+              <button 
+                type="button" 
+                id="carousel-prev" 
+                class="sd-nav-btn" 
+                aria-label="Previous piece"
+              >
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                  <path d="M12.5 4.5L7 10l5.5 5.5"></path>
+                </svg>
+              </button>
+              <button 
+                type="button" 
+                id="carousel-next" 
+                class="sd-nav-btn" 
+                aria-label="Next piece"
+              >
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                  <path d="M7.5 4.5L13 10l-5.5 5.5"></path>
+                </svg>
+              </button>
+            </div>
+
+            <a href="#contact" class="sd-lookbook-link">Ask for the full lookbook</a>
+          </div>
         </div>
       </div>
     </div>
-  </div>
   </div>
 </section>
 
@@ -148,6 +184,7 @@ const { accent = ACCENT_COLOR } = Astro.props;
     let trackPos = 1; // 1 = slide 0 (first real slide, offset by clone)
     let isTransitioning = false;
     let pointerStartX = null;
+    let pointerStartY = null;
 
     const viewport = document.getElementById('carousel-viewport');
     const track = document.getElementById('carousel-track');
@@ -155,7 +192,10 @@ const { accent = ACCENT_COLOR } = Astro.props;
     const detailsEl = document.getElementById('piece-details');
     const nameEl = document.getElementById('piece-name');
     const codeEl = document.getElementById('piece-code');
+    const categoryEl = document.getElementById('piece-category');
     const descEl = document.getElementById('piece-desc');
+    const mobileProgressBar = document.getElementById('mobile-progress-bar');
+    const mobileProgressContainer = document.querySelector('.sd-mobile-progress');
     const prevBtn = document.getElementById('carousel-prev');
     const nextBtn = document.getElementById('carousel-next');
     const segmentBtns = Array.from(document.querySelectorAll('.sd-segment-btn'));
@@ -164,18 +204,41 @@ const { accent = ACCENT_COLOR } = Astro.props;
       return (v < 10 ? '0' : '') + v;
     }
 
+    function checkReducedMotion() {
+      return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    }
+
     function updateDetails(index) {
       if (counterEl) counterEl.textContent = `${pad(index + 1)} / ${pad(total)}`;
+      if (mobileProgressBar) {
+        mobileProgressBar.style.width = `${((index + 1) / total) * 100}%`;
+      }
+      if (mobileProgressContainer) {
+        mobileProgressContainer.setAttribute('aria-valuenow', String(index + 1));
+      }
+
+      const reduced = checkReducedMotion();
+
       if (detailsEl) {
-        detailsEl.classList.add('is-animating');
-        setTimeout(() => {
+        if (reduced) {
           const cur = pieces[index];
           if (nameEl) nameEl.textContent = cur.name;
           if (codeEl) codeEl.textContent = cur.code;
+          if (categoryEl) categoryEl.textContent = cur.category || '';
           if (descEl) descEl.textContent = cur.desc;
-          detailsEl.classList.remove('is-animating');
-        }, 260);
+        } else {
+          detailsEl.classList.add('is-animating');
+          setTimeout(() => {
+            const cur = pieces[index];
+            if (nameEl) nameEl.textContent = cur.name;
+            if (codeEl) codeEl.textContent = cur.code;
+            if (categoryEl) categoryEl.textContent = cur.category || '';
+            if (descEl) descEl.textContent = cur.desc;
+            detailsEl.classList.remove('is-animating');
+          }, 260);
+        }
       }
+
       segmentBtns.forEach((btn, j) => {
         const isActive = j === index;
         btn.classList.toggle('is-active', isActive);
@@ -186,12 +249,24 @@ const { accent = ACCENT_COLOR } = Astro.props;
     function setTrackPosition(pos, animate = true) {
       trackPos = pos;
       if (track) {
-        if (animate) {
+        const reduced = checkReducedMotion();
+        if (animate && !reduced) {
           track.style.transition = 'transform 0.95s cubic-bezier(0.22, 1, 0.36, 1)';
         } else {
           track.style.transition = 'none';
         }
         track.style.transform = `translateX(-${pos * 100}%)`;
+
+        if (reduced && animate) {
+          setTimeout(() => {
+            if (trackPos === total + 1) {
+              setTrackPosition(1, false);
+            } else if (trackPos === 0) {
+              setTrackPosition(total, false);
+            }
+            isTransitioning = false;
+          }, 50);
+        }
       }
     }
 
@@ -229,7 +304,7 @@ const { accent = ACCENT_COLOR } = Astro.props;
       isTransitioning = false;
     });
 
-    // Handlers
+    // Button Click Handlers
     prevBtn?.addEventListener('click', prev);
     nextBtn?.addEventListener('click', next);
 
@@ -237,19 +312,50 @@ const { accent = ACCENT_COLOR } = Astro.props;
       btn.addEventListener('click', () => goTo(idx));
     });
 
-    // Touch / Pointer Swipe
+    // Touch & Pointer Gestures
     if (viewport) {
+      // Touch events (Mobile Safari / Chrome)
+      let touchStartX = null;
+      let touchStartY = null;
+
+      viewport.addEventListener('touchstart', (e) => {
+        if (isTransitioning || e.touches.length > 1) return;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+      }, { passive: true });
+
+      viewport.addEventListener('touchend', (e) => {
+        if (touchStartX === null) return;
+        const touch = e.changedTouches[0];
+        const deltaX = touch.clientX - touchStartX;
+        const deltaY = touch.clientY - (touchStartY ?? touch.clientY);
+        touchStartX = null;
+        touchStartY = null;
+
+        if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 35) {
+          if (deltaX < 0) next();
+          else prev();
+        }
+      }, { passive: true });
+
+      // Pointer events (Desktop Drag / Trackpad)
       viewport.addEventListener('pointerdown', (e) => {
-        if (isTransitioning) return;
+        if (isTransitioning || e.pointerType === 'touch') return;
         pointerStartX = e.clientX;
+        pointerStartY = e.clientY;
       });
 
       viewport.addEventListener('pointerup', (e) => {
-        if (pointerStartX === null) return;
-        const delta = e.clientX - pointerStartX;
+        if (pointerStartX === null || e.pointerType === 'touch') return;
+        const deltaX = e.clientX - pointerStartX;
+        const deltaY = e.clientY - (pointerStartY ?? e.clientY);
         pointerStartX = null;
-        if (delta < -40) next();
-        else if (delta > 40) prev();
+        pointerStartY = null;
+
+        if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 35) {
+          if (deltaX < 0) next();
+          else prev();
+        }
       });
 
       // Keyboard support
@@ -336,6 +442,7 @@ const { accent = ACCENT_COLOR } = Astro.props;
     width: 100%;
     height: 100%;
     object-fit: contain;
+    aspect-ratio: 3 / 4;
     user-select: none;
     pointer-events: none;
     transition: transform 0.95s cubic-bezier(0.22, 1, 0.36, 1);
@@ -364,7 +471,7 @@ const { accent = ACCENT_COLOR } = Astro.props;
   }
 
   .sd-carousel-counter {
-    font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    font-family: var(--sd-font-mono, 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace);
     font-size: 14px;
     color: #56606A;
   }
@@ -382,18 +489,40 @@ const { accent = ACCENT_COLOR } = Astro.props;
     transform: translateY(8px);
   }
 
+  .sd-piece-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .sd-piece-code {
+    font-family: var(--sd-font-mono, 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace);
+    font-size: 14px;
+    color: #56606A;
+    letter-spacing: 0.05em;
+  }
+
+  .sd-piece-meta-dot {
+    font-size: 11px;
+    color: #8E98A0;
+    line-height: 1;
+  }
+
+  .sd-piece-category {
+    font-family: var(--sd-font-mono, 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent-color, #E0A030);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
   .sd-piece-name {
     margin: 0;
     font-size: 44px;
     font-weight: 500;
     line-height: 1.08;
     color: #1F262D;
-  }
-
-  .sd-piece-code {
-    font-family: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
-    font-size: 14px;
-    color: #56606A;
   }
 
   .sd-piece-desc {
@@ -412,12 +541,14 @@ const { accent = ACCENT_COLOR } = Astro.props;
 
   .sd-segments {
     display: flex;
-    gap: 6px;
+    gap: 4px;
+    width: 100%;
   }
 
   .sd-segment-btn {
-    flex-grow: 1;
-    height: 44px;
+    flex: 1 1 0;
+    min-width: 0;
+    height: 36px;
     padding: 0;
     border: 0;
     background: transparent;
@@ -431,11 +562,28 @@ const { accent = ACCENT_COLOR } = Astro.props;
     width: 100%;
     height: 2px;
     background: #B4BAB6;
-    transition: background-color 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    border-radius: 1px;
+    transition: background-color 0.45s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .sd-segment-btn.is-active .sd-segment-bar {
     background: var(--accent-color, #E0A030);
+  }
+
+  .sd-mobile-progress {
+    display: none;
+    width: 100%;
+    height: 2px;
+    background: #B4BAB6;
+    border-radius: 1px;
+    overflow: hidden;
+  }
+
+  .sd-mobile-progress-bar {
+    height: 100%;
+    background: var(--accent-color, #E0A030);
+    border-radius: 1px;
+    transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .sd-nav-row {
@@ -483,6 +631,16 @@ const { accent = ACCENT_COLOR } = Astro.props;
     border-color: #56606A;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .sd-carousel-track,
+    .sd-carousel-img,
+    .sd-piece-details,
+    .sd-segment-bar,
+    .sd-mobile-progress-bar {
+      transition: none !important;
+    }
+  }
+
   @media (max-width: 1024px) {
     .sd-work {
       min-height: auto;
@@ -509,15 +667,25 @@ const { accent = ACCENT_COLOR } = Astro.props;
   @media (max-width: 640px) {
     .sd-work-content {
       padding: 40px 24px;
+      gap: 36px;
     }
     .sd-carousel-viewport {
-      height: 340px;
+      height: 360px;
     }
     .sd-carousel-title {
-      font-size: 44px;
+      font-size: 40px;
     }
     .sd-piece-name {
-      font-size: 32px;
+      font-size: 30px;
+    }
+    .sd-piece-desc {
+      font-size: 16px;
+    }
+    .sd-segments {
+      display: none;
+    }
+    .sd-mobile-progress {
+      display: block;
     }
   }
 </style>

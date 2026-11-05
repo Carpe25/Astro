@@ -5,72 +5,190 @@ export interface JewelryPiece {
   desc: string;
   image: string;
   alt: string;
+  category?: string;
+  srcset?: string;
 }
 
 export const PIECES: JewelryPiece[] = [
   {
-    "id": "UD1078",
-    "name": "Rainbow necklace",
-    "code": "UD1078",
-    "desc": "Emerald-cut colored stones graded through the spectrum, set in yellow gold.",
-    "image": "/assets/304be120b386ba9415be91d00c6c35c4.jpg",
-    "alt": "Yellow gold necklace of emerald-cut stones graded through the rainbow"
+    id: "SN00145",
+    name: "Emerald Cascade Necklace",
+    code: "SN00145",
+    category: "Necklace",
+    desc: "A considered expression of form, material and craftsmanship.",
+    image: "/assets/jewelry/sn00145-emerald-cascade-necklace.webp",
+    srcset: "/assets/jewelry/sn00145-emerald-cascade-necklace-480.webp 480w, /assets/jewelry/sn00145-emerald-cascade-necklace-800.webp 800w, /assets/jewelry/sn00145-emerald-cascade-necklace-1200.webp 1200w",
+    alt: "Emerald Cascade Necklace featuring a fine green emerald centerpiece framed by cascading white diamonds"
   },
   {
-    "id": "UD1165",
-    "name": "Graduated diamond necklace",
-    "code": "UD1165",
-    "desc": "Five round diamonds, graduated in size, on a fine chain.",
-    "image": "/assets/c471f12e5057e4db028394c77f5d9fc1.jpg",
-    "alt": "Necklace with five graduated round diamonds"
+    id: "SR00098",
+    name: "The Arc Solitaire Ring",
+    code: "SR00098",
+    category: "Ring",
+    desc: "A considered expression of form, material and craftsmanship.",
+    image: "/assets/jewelry/sr00098-the-arc-solitaire-ring.webp",
+    srcset: "/assets/jewelry/sr00098-the-arc-solitaire-ring-480.webp 480w, /assets/jewelry/sr00098-the-arc-solitaire-ring-800.webp 800w, /assets/jewelry/sr00098-the-arc-solitaire-ring-1200.webp 1200w",
+    alt: "The Arc Solitaire Ring with a brilliant round white diamond nestled above a pavé-set contoured gold band"
   },
   {
-    "id": "UD1157",
-    "name": "Toi et moi pendant",
-    "code": "UD1157",
-    "desc": "A green and a red pear-shaped stone, linked by a line of diamonds.",
-    "image": "/assets/214e92539844b44e12bcf92acf55a30f.jpg",
-    "alt": "Pendant with a green and a red pear-shaped stone"
+    id: "SE0005",
+    name: "Infinity Fall Earrings",
+    code: "SE0005",
+    category: "Earring",
+    desc: "A considered expression of form, material and craftsmanship.",
+    image: "/assets/jewelry/se0005-infinity-fall-earrings.webp",
+    srcset: "/assets/jewelry/se0005-infinity-fall-earrings-480.webp 480w, /assets/jewelry/se0005-infinity-fall-earrings-800.webp 800w, /assets/jewelry/se0005-infinity-fall-earrings-1200.webp 1200w",
+    alt: "Infinity Fall Earrings with pear-cut vivid red rubies and delicate looped white diamond drops"
   },
   {
-    "id": "UD1214",
-    "name": "Diamond eternity band",
-    "code": "UD1214",
-    "desc": "Round diamonds set all the way around the band.",
-    "image": "/assets/e4f7933a364991ab68dca920d2b0278d.jpg",
-    "alt": "Eternity band of round diamonds"
+    id: "SR00080",
+    name: "Vertex Signet Ring",
+    code: "SR00080",
+    category: "Ring",
+    desc: "A considered expression of form, material and craftsmanship.",
+    image: "/assets/jewelry/sr00080-vertex-signet-ring.webp",
+    srcset: "/assets/jewelry/sr00080-vertex-signet-ring-480.webp 480w, /assets/jewelry/sr00080-vertex-signet-ring-800.webp 800w, /assets/jewelry/sr00080-vertex-signet-ring-1200.webp 1200w",
+    alt: "Vertex Signet Ring in sculptural yellow gold set with twin square princess-cut white diamonds"
   },
   {
-    "id": "UD1164",
-    "name": "Blue circle",
-    "code": "UD1164",
-    "desc": "Pale blue stones alternating with diamonds in an open circle.",
-    "image": "/assets/3f964eb825b93608cf9bc025132c347c.jpg",
-    "alt": "Open circle of pale blue stones and diamonds"
+    id: "SE00084",
+    name: "Soho Cluster Studs",
+    code: "SE00084",
+    category: "Earring",
+    desc: "A considered expression of form, material and craftsmanship.",
+    image: "/assets/jewelry/se00084-soho-cluster-studs.webp",
+    srcset: "/assets/jewelry/se00084-soho-cluster-studs-480.webp 480w, /assets/jewelry/se00084-soho-cluster-studs-800.webp 800w, /assets/jewelry/se00084-soho-cluster-studs-1200.webp 1200w",
+    alt: "Soho Cluster Studs featuring a vibrant mosaic of emeralds, coral cabochons, rubies and diamond pavé"
   },
   {
-    "id": "UD1207",
-    "name": "Curved diamond band",
-    "code": "UD1207",
-    "desc": "Five diamonds on a gently curved rose gold band.",
-    "image": "/assets/bcd58987766a067beb95686d6cae8d14.jpg",
-    "alt": "Curved rose gold band with five diamonds"
+    id: "SN00152",
+    name: "Polki Fresco Pendant",
+    code: "SN00152",
+    category: "Necklace",
+    desc: "A considered expression of form, material and craftsmanship.",
+    image: "/assets/jewelry/sn00152-polki-fresco-pendant.webp",
+    srcset: "/assets/jewelry/sn00152-polki-fresco-pendant-480.webp 480w, /assets/jewelry/sn00152-polki-fresco-pendant-800.webp 800w, /assets/jewelry/sn00152-polki-fresco-pendant-1200.webp 1200w",
+    alt: "Polki Fresco Pendant necklace showcasing uncut polki diamonds encircled by fine enamel detailing"
   },
   {
-    "id": "UD1217",
-    "name": "Line necklace",
-    "code": "UD1217",
-    "desc": "Channel-set blue stones alternating with round diamonds.",
-    "image": "/assets/c012d235ea4aa780c12f6bf40ba882e1.jpg",
-    "alt": "Necklace of channel-set blue stones and round diamonds"
+    id: "SBR00015",
+    name: "Stream Emerald Tennis Bracelet",
+    code: "SBR00015",
+    category: "Bracelet",
+    desc: "A considered expression of form, material and craftsmanship.",
+    image: "/assets/jewelry/sbr00015-stream-emerald-tennis-bracelet.webp",
+    srcset: "/assets/jewelry/sbr00015-stream-emerald-tennis-bracelet-480.webp 480w, /assets/jewelry/sbr00015-stream-emerald-tennis-bracelet-800.webp 800w, /assets/jewelry/sbr00015-stream-emerald-tennis-bracelet-1200.webp 1200w",
+    alt: "Stream Emerald Tennis Bracelet crafted in yellow gold with alternating pear and emerald-cut green gems"
   },
   {
-    "id": "UD1245",
-    "name": "Hammered solitaire",
-    "code": "UD1245",
-    "desc": "An oval diamond on a wide band of hammered yellow gold.",
-    "image": "/assets/ud1245-1793347787676.jpg",
-    "alt": "Hammered yellow gold ring with an oval diamond"
+    id: "SE00086",
+    name: "Mosaic Flower Pearl Earrings",
+    code: "SE00086",
+    category: "Earring",
+    desc: "A considered expression of form, material and craftsmanship.",
+    image: "/assets/jewelry/se00086-mosaic-flower-pearl-earrings.webp",
+    srcset: "/assets/jewelry/se00086-mosaic-flower-pearl-earrings-480.webp 480w, /assets/jewelry/se00086-mosaic-flower-pearl-earrings-800.webp 800w, /assets/jewelry/se00086-mosaic-flower-pearl-earrings-1200.webp 1200w",
+    alt: "Mosaic Flower Pearl Earrings featuring multi-colored gemstone petals and lustrous natural pearl drops"
+  },
+  {
+    id: "SR00031",
+    name: "Wildflower Ring",
+    code: "SR00031",
+    category: "Ring",
+    desc: "A considered expression of form, material and craftsmanship.",
+    image: "/assets/jewelry/sr00031-wildflower-ring.webp",
+    srcset: "/assets/jewelry/sr00031-wildflower-ring-480.webp 480w, /assets/jewelry/sr00031-wildflower-ring-800.webp 800w, /assets/jewelry/sr00031-wildflower-ring-1200.webp 1200w",
+    alt: "Wildflower Ring in white gold set with marquise and pear-cut white diamonds in an open floral motif"
+  },
+  {
+    id: "SN00129",
+    name: "Scarlet Noor Necklace",
+    code: "SN00129",
+    category: "Necklace",
+    desc: "A considered expression of form, material and craftsmanship.",
+    image: "/assets/jewelry/sn00129-scarlet-noor-necklace.webp",
+    srcset: "/assets/jewelry/sn00129-scarlet-noor-necklace-480.webp 480w, /assets/jewelry/sn00129-scarlet-noor-necklace-800.webp 800w, /assets/jewelry/sn00129-scarlet-noor-necklace-1200.webp 1200w",
+    alt: "Scarlet Noor Necklace with graduated pear-shaped red rubies interspersed with brilliant white diamonds"
+  },
+  {
+    id: "SE00102",
+    name: "Orbit Halo Studs",
+    code: "SE00102",
+    category: "Earring",
+    desc: "A considered expression of form, material and craftsmanship.",
+    image: "/assets/jewelry/se00102-orbit-halo-studs.webp",
+    srcset: "/assets/jewelry/se00102-orbit-halo-studs-480.webp 480w, /assets/jewelry/se00102-orbit-halo-studs-800.webp 800w, /assets/jewelry/se00102-orbit-halo-studs-1200.webp 1200w",
+    alt: "Orbit Halo Studs with brilliant-cut white diamonds surrounded by architectural spiral halos"
+  },
+  {
+    id: "SR00065",
+    name: "Coral Bamboo Ring",
+    code: "SR00065",
+    category: "Ring",
+    desc: "A considered expression of form, material and craftsmanship.",
+    image: "/assets/jewelry/sr00065-coral-bamboo-ring.webp",
+    srcset: "/assets/jewelry/sr00065-coral-bamboo-ring-480.webp 480w, /assets/jewelry/sr00065-coral-bamboo-ring-800.webp 800w, /assets/jewelry/sr00065-coral-bamboo-ring-1200.webp 1200w",
+    alt: "Coral Bamboo Ring featuring warm terracotta coral spheres on a carved yellow gold bamboo band"
+  },
+  {
+    id: "SE00136",
+    name: "Rosette Polki Studs",
+    code: "SE00136",
+    category: "Earring",
+    desc: "A considered expression of form, material and craftsmanship.",
+    image: "/assets/jewelry/se00136-rosette-polki-studs.webp",
+    srcset: "/assets/jewelry/se00136-rosette-polki-studs-480.webp 480w, /assets/jewelry/se00136-rosette-polki-studs-800.webp 800w, /assets/jewelry/se00136-rosette-polki-studs-1200.webp 1200w",
+    alt: "Rosette Polki Studs featuring flat-cut polki diamond centers framed by undulating pavé petals"
+  },
+  {
+    id: "SBR00040",
+    name: "Everleaf Clover Bracelet",
+    code: "SBR00040",
+    category: "Bracelet",
+    desc: "A considered expression of form, material and craftsmanship.",
+    image: "/assets/jewelry/sbr00040-everleaf-clover-bracelet.webp",
+    srcset: "/assets/jewelry/sbr00040-everleaf-clover-bracelet-480.webp 480w, /assets/jewelry/sbr00040-everleaf-clover-bracelet-800.webp 800w, /assets/jewelry/sbr00040-everleaf-clover-bracelet-1200.webp 1200w",
+    alt: "Everleaf Clover Bracelet in yellow gold chain with malachite, turquoise and diamond clover motifs"
+  },
+  {
+    id: "SR00089",
+    name: "Diamond Coil Ring",
+    code: "SR00089",
+    category: "Ring",
+    desc: "A considered expression of form, material and craftsmanship.",
+    image: "/assets/jewelry/sr00089-diamond-coil-ring.webp",
+    srcset: "/assets/jewelry/sr00089-diamond-coil-ring-480.webp 480w, /assets/jewelry/sr00089-diamond-coil-ring-800.webp 800w, /assets/jewelry/sr00089-diamond-coil-ring-1200.webp 1200w",
+    alt: "Diamond Coil Ring with continuous spirals of polished yellow gold capped by bezel-set white diamonds"
+  },
+  {
+    id: "SE00155",
+    name: "The Orchard Earrings",
+    code: "SE00155",
+    category: "Earring",
+    desc: "A considered expression of form, material and craftsmanship.",
+    image: "/assets/jewelry/se00155-the-orchard-earrings.webp",
+    srcset: "/assets/jewelry/se00155-the-orchard-earrings-480.webp 480w, /assets/jewelry/se00155-the-orchard-earrings-800.webp 800w, /assets/jewelry/se00155-the-orchard-earrings-1200.webp 1200w",
+    alt: "The Orchard Earrings with cascading emerald cabochons, rich purple enamel and brilliant diamond halos"
+  },
+  {
+    id: "SR00147",
+    name: "Zenith Sapphire Ring",
+    code: "SR00147",
+    category: "Ring",
+    desc: "A considered expression of form, material and craftsmanship.",
+    image: "/assets/jewelry/sr00147-zenith-sapphire-ring.webp",
+    srcset: "/assets/jewelry/sr00147-zenith-sapphire-ring-480.webp 480w, /assets/jewelry/sr00147-zenith-sapphire-ring-800.webp 800w, /assets/jewelry/sr00147-zenith-sapphire-ring-1200.webp 1200w",
+    alt: "Zenith Sapphire Ring with an oval deep blue sapphire enveloped in an explosion of baguette and marquise diamonds"
+  },
+  {
+    id: "SE00088",
+    name: "Peekaboo Earrings",
+    code: "SE00088",
+    category: "Earring",
+    desc: "A considered expression of form, material and craftsmanship.",
+    image: "/assets/jewelry/se00088-peekaboo-earrings.webp",
+    srcset: "/assets/jewelry/se00088-peekaboo-earrings-480.webp 480w, /assets/jewelry/se00088-peekaboo-earrings-800.webp 800w, /assets/jewelry/se00088-peekaboo-earrings-1200.webp 1200w",
+    alt: "Peekaboo Earrings with ribbed yellow gold and white diamond pavé curving to a hidden gemstone tip"
   }
 ];
 
